@@ -32,8 +32,6 @@
        <mapper resource="com/dianfeng/dao/xml/BlacklistInfoDao.xml"/>
        <mapper resource="com/dianfeng/dao/xml/TransferDao.xml"/>
 
-       <mapper resource="com/dianfeng/dao/xml/QueueLogDao.xml"/>
-
        <mapper resource="com/dianfeng/dao/xml/RecordDao.xml"/>
        <mapper resource="com/dianfeng/dao/xml/FollowHistoryInfoDao.xml"/>
 
