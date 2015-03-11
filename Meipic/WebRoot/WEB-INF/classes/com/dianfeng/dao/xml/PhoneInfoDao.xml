@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	<mapper namespace="com.dianfeng.dao.PhoneInfoDao">
+	
+	<select id="getPhoneInfoByPhoneId" parameterType="String" resultMap="phoneInfoMap">
+		SELECT * FROM phone_info WHERE phone_id = #{phoneId}
+	</select>
+	
+	<select id="getPhoneInfoByCustomerId" parameterType="String" resultMap="phoneInfoMap">
+		SELECT * FROM customer_phone_link LEFT OUTER JOIN phone_info ON customer_phone_link.phone_id = phone_info.phone_id WHERE customer_phone_link.customer_id = #{customerId}
+	</select>
+	
+	<select id="getMaxPhoneId" resultType="long">
+		SELECT CASE WHEN MAX(phone_id) IS NULL THEN 1 ELSE  MAX(phone_id) END FROM phone_info
+	</select>
+	
+	<insert id="insertPhoneInfo" parameterType="java.util.List">
+		insert into phone_info(
+		phone_id,
+		phone_imei,
+		phone_model,
+		phone_version,
+		phone_buy_time) values
+		<foreach collection="phoneInfoList" item="item"  separator="," index="index">  
+        (#{item.id},
+        #{item.imei},
+        #{item.model},
+        #{item.version},
+        #{item.buyTime})
+        </foreach>
+	</insert>
+	
+	<insert id="insertOnePhoneInfo" parameterType="com.dianfeng.entity.PhoneInfo" useGeneratedKeys="true" keyProperty="id">
+		insert into phone_info(
+		phone_imei,
+		phone_model,
+		phone_version,
+		phone_buy_time) values
+        (#{imei},
+        #{model},
+        #{version},
+        #{buyTime})
+	</insert>
+	
+	<update id="updatePhoneInfo" parameterType="java.util.List">
+		<foreach collection="phoneInfoList" item="item" index="index" open="" close="" separator=";">
+			update phone_info
+			<set>
+				phone_imei = #{item.imei},
+				phone_model = #{item.model},
+				phone_version = #{item.version},
+				phone_buy_time = #{item.buyTime} 
+			</set>
+            where  phone_id = #{item.id}
+         </foreach>
+	</update>
+	
+	<delete id="deletePhoneInfo" parameterType="java.util.List">  
+	    DELETE FROM phone_info WHERE phone_id IN  
+	    <foreach collection="phoneInfoList" index="index" item="item" open="(" separator="," close=")">   
+	        #{item.id}   
+	    </foreach>  
+	</delete>
+	
+	<delete id="deletePhoneInfoByCustomerId" parameterType="String">
+		DELETE FROM phone_info WHERE phone_id IN (SELECT phone_id FROM customer_phone_link WHERE customer_id =#{customerId})
+	</delete>
+
+	<resultMap type="com.dianfeng.entity.PhoneInfo" id="phoneInfoMap">
+		<result column="phone_id" property="id"/>
+		<result column="phone_imei" property="imei"/>
+		<result column="phone_model" property="model"/>
+		<result column="phone_version" property="version"/>
+		<result column="phone_buy_time" property="buyTime"/>
+	</resultMap>
+	
+	</mapper>

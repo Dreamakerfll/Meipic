@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	<mapper namespace="com.dianfeng.dao.WorkOrderInfoDao">
+	
+	<insert id="insertWorkOrderInfo" parameterType="com.dianfeng.entity.WorkOrderInfo" useGeneratedKeys="true" keyProperty="id">
+		insert into work_order_info(
+		work_order_assembly_line,
+		work_order_tel,
+		work_order_tel_time,
+		work_order_title,
+		work_order_level,
+		work_order_feedback_time,
+		work_order_feedback_type,
+		work_order_feedback_channel,
+		work_order_treatment_scheme,
+		work_order_final_decision,
+		work_order_user_agent,
+		work_order_user_account,
+		work_order_skill_group,
+		work_order_unique_id) values
+        (#{assemblyLine},
+        #{tel},
+        #{telTime},
+        #{title},
+        #{level},
+        #{feedbackTime},
+        #{feedbackType},
+        #{feedbackChannel},
+        #{treatmentScheme},
+        #{finalDecision},
+        #{userAgent},
+        #{userAccount},
+        #{skillGroup},
+        #{uniqueId})
+	</insert>
+	
+	<update id="updateWorkOrderInfo" parameterType="com.dianfeng.entity.WorkOrderInfo">
+			update work_order_info set
+				work_order_user_agent = #{userAgent},
+				work_order_user_account = #{userAccount},
+				work_order_treatment_scheme = #{treatmentScheme},
+				work_order_final_decision = #{finalDecision}
+            where work_order_id = #{id}
+	</update>
+	
+	<delete id="deleteWorkOrderInfo" parameterType="String">
+		delete from work_order_info where work_order_id = #{id}
+	</delete>
+	
+	<select id="getDetailWorkOrder" parameterType="com.dianfeng.entity.WorkOrderDetailInfo" resultMap="workOrderDetailInfoMap">
+		SELECT * FROM (SELECT work_order_id FROM (SELECT work_order_table.work_order_id FROM (SELECT * FROM work_order_info 
+		LEFT OUTER JOIN follow_history_info ON work_order_info.work_order_id = follow_history_info.follow_history_work_order_id WHERE 1=1 
+		<if test="assemblyLine !=null and assemblyLine !=''">
+			and work_order_info.work_order_assembly_line like concat(concat('%', #{assemblyLine}),'%')
+		</if>
+		<if test="title !=null and title !=''">
+			and work_order_info.work_order_title like concat(concat('%', #{title}),'%')
+		</if>
+		<if test="workOrderTel !=null and workOrderTel !=''">
+			and work_order_info.work_order_tel like concat(concat('%', #{workOrderTel}),'%')
+		</if>
+		<if test="beginTime !=null and beginTime !=''">
+			and work_order_info.work_order_tel_time &gt;= #{beginTime}
+		</if>
+		<if test="endTime !=null and endTime !=''">
+			and work_order_info.work_order_tel_time &lt;= #{endTime}
+		</if>
+		<if test="level !=null and level !=''">
+			and work_order_info.work_order_level = #{level}
+		</if>
+		<if test="feedbackType !=null and feedbackType !=''">
+			and work_order_info.work_order_feedback_type = #{feedbackType}
+		</if>
+		<if test="feedbackChannel !=null and feedbackChannel !=''">
+			and work_order_info.work_order_feedback_channel = #{feedbackChannel}
+		</if>
+		<if test="treatmentScheme !=null and treatmentScheme !=''">
+			and (work_order_info.work_order_treatment_scheme like concat(concat('%', #{treatmentScheme}),'%') or 
+			follow_history_info.follow_history_treatment_scheme like concat(concat('%', #{treatmentScheme}),'%'))
+		</if>
+		<if test="finalDecision !=null and finalDecision !=''">
+			and work_order_info.work_order_final_decision = #{finalDecision}
+		</if>
+		<if test="userAccount !=null and userAccount !=''">
+			and (work_order_info.work_order_user_account = #{userAccount} 
+			or follow_history_info.follow_history_account = #{userAccount})
+		</if>
+		<if test="skillGroup !=null and skillGroup !=''">
+			and work_order_info.work_order_skill_group = #{skillGroup}
+		</if>
+		
+		) AS work_order_table 
+		LEFT OUTER JOIN work_order_question_link ON work_order_table.work_order_id = work_order_question_link.work_order_id 
+		LEFT OUTER JOIN question_info ON work_order_question_link.question_id = question_info.question_id 
+		LEFT OUTER JOIN customer_work_order_link ON work_order_table.work_order_id = customer_work_order_link.work_order_id 
+		LEFT OUTER JOIN customer_info ON customer_work_order_link.customer_id = customer_info.customer_id WHERE 1=1
+		 
+		<if test="name !=null and name !=''">
+			and customer_info.customer_name like concat(concat('%', #{name}),'%')
+		</if>
+		<if test="sex !=null and sex !=''">
+			and customer_info.customer_sex = #{sex}
+		</if>
+		<if test="area !=null and area !=''">
+			and customer_info.customer_area like concat(concat('%', #{area}),'%')
+		</if>
+		<if test="qq !=null and qq !=''">
+			and customer_info.customer_qq like concat(concat('%', #{qq}),'%')
+		</if>
+		<if test="tel !=null and tel !=''">
+			and customer_info.customer_tel like concat(concat('%', #{tel}),'%')
+		</if>
+		<if test="wechat !=null and wechat !=''">
+			and customer_info.customer_wechat like concat(concat('%', #{wechat}),'%')
+		</if>
+		<if test="weibo !=null and weibo !=''">
+			and customer_info.customer_weibo like concat(concat('%', #{weibo}),'%')
+		</if>
+		<if test="taobao !=null and taobao !=''">
+			and customer_info.customer_taobao like concat(concat('%', #{taobao}),'%')
+		</if>
+		<if test="email !=null and email !=''">
+			and customer_info.customer_email like concat(concat('%', #{email}),'%')
+		</if>
+		<if test="jd !=null and jd !=''">
+			and customer_info.customer_jd like concat(concat('%', #{jd}),'%')
+		</if>
+		<if test="type !=null and type !=''">
+			and customer_info.customer_type like concat(concat('%', #{type}),'%')
+		</if>
+		
+		
+		<if test="mold !=null and mold !=''">
+			and question_info.question_mold = #{mold}
+		</if>
+		<if test="questionType !=null and questionType !=''">
+			and question_info.question_type = #{questionType}
+		</if>
+		<if test="describe !=null and describe !=''">
+			and question_info.question_describe like concat(concat('%', #{describe}),'%')
+		</if>
+		<if test="phoneImei !=null and phoneImei !=''">
+			and question_info.question_phone_imei like concat(concat('%', #{phoneImei}),'%')
+		</if>
+		<if test="phoneModel !=null and phoneModel !=''">
+			and question_info.question_phone_model = #{phoneModel}
+		</if>
+		<if test="phoneVersion !=null and phoneVersion !=''">
+			and question_info.question_phone_version = #{phoneVersion}
+		</if>
+		<if test="status !=null and status !=''">
+			and question_info.question_status =#{status}
+		</if>
+		 ) AS end_table GROUP BY work_order_id order by work_order_id desc LIMIT #{page},#{rows}) AS work_order_id_table 
+		LEFT OUTER JOIN work_order_info ON work_order_id_table.work_order_id = work_order_info.work_order_id 
+		LEFT OUTER JOIN work_order_question_link ON work_order_id_table.work_order_id = work_order_question_link.work_order_id 
+		LEFT OUTER JOIN question_info ON work_order_question_link.question_id = question_info.question_id 
+		LEFT OUTER JOIN customer_work_order_link ON work_order_id_table.work_order_id = customer_work_order_link.work_order_id 
+		LEFT OUTER JOIN customer_info ON customer_work_order_link.customer_id = customer_info.customer_id 
+		 
+		 
+	</select>
+	
+	<select id="getDetailWorkOrderCount" parameterType="com.dianfeng.entity.WorkOrderDetailInfo" resultType="Integer">
+		SELECT count(distinct work_order_table.work_order_id) FROM (SELECT * FROM work_order_info 
+		LEFT OUTER JOIN follow_history_info ON work_order_info.work_order_id = follow_history_info.follow_history_work_order_id WHERE 1=1 
+		<if test="assemblyLine !=null and assemblyLine !=''">
+			and work_order_info.work_order_assembly_line like concat(concat('%', #{assemblyLine}),'%')
+		</if>
+		<if test="title !=null and title !=''">
+			and work_order_info.work_order_title like concat(concat('%', #{title}),'%')
+		</if>
+		<if test="workOrderTel !=null and workOrderTel !=''">
+			and work_order_info.work_order_tel like concat(concat('%', #{workOrderTel}),'%')
+		</if>
+		<if test="beginTime !=null and beginTime !=''">
+			and work_order_info.work_order_tel_time &gt;= #{beginTime}
+		</if>
+		<if test="endTime !=null and endTime !=''">
+			and work_order_info.work_order_tel_time &lt;= #{endTime}
+		</if>
+		<if test="level !=null and level !=''">
+			and work_order_info.work_order_level = #{level}
+		</if>
+		<if test="feedbackType !=null and feedbackType !=''">
+			and work_order_info.work_order_feedback_type = #{feedbackType}
+		</if>
+		<if test="feedbackChannel !=null and feedbackChannel !=''">
+			and work_order_info.work_order_feedback_channel = #{feedbackChannel}
+		</if>
+		<if test="treatmentScheme !=null and treatmentScheme !=''">
+			and (work_order_info.work_order_treatment_scheme like concat(concat('%', #{treatmentScheme}),'%') or 
+			follow_history_info.follow_history_treatment_scheme like concat(concat('%', #{treatmentScheme}),'%'))
+		</if>
+		<if test="finalDecision !=null and finalDecision !=''">
+			and work_order_info.work_order_final_decision = #{finalDecision}
+		</if>
+		<if test="userAccount !=null and userAccount !=''">
+			and (work_order_info.work_order_user_account = #{userAccount}
+			or follow_history_info.follow_history_account = #{userAccount})
+		</if>
+		<if test="skillGroup !=null and skillGroup !=''">
+			and work_order_info.work_order_skill_group = #{skillGroup}
+		</if>
+		
+		
+		 ) AS work_order_table LEFT OUTER JOIN work_order_question_link ON work_order_table.work_order_id = work_order_question_link.work_order_id LEFT OUTER JOIN question_info ON work_order_question_link.question_id = question_info.question_id LEFT OUTER JOIN customer_work_order_link ON work_order_table.work_order_id = customer_work_order_link.work_order_id LEFT OUTER JOIN customer_info ON customer_work_order_link.customer_id = customer_info.customer_id where 1=1 
+		 
+		<if test="name !=null and name !=''">
+			and customer_info.customer_name like concat(concat('%', #{name}),'%')
+		</if>
+		<if test="sex !=null and sex !=''">
+			and customer_info.customer_sex = #{sex}
+		</if>
+		<if test="area !=null and area !=''">
+			and customer_info.customer_area like concat(concat('%', #{area}),'%')
+		</if>
+		<if test="qq !=null and qq !=''">
+			and customer_info.customer_qq like concat(concat('%', #{qq}),'%')
+		</if>
+		<if test="tel !=null and tel !=''">
+			and customer_info.customer_tel like concat(concat('%', #{tel}),'%')
+		</if>
+		<if test="wechat !=null and wechat !=''">
+			and customer_info.customer_wechat like concat(concat('%', #{wechat}),'%')
+		</if>
+		<if test="weibo !=null and weibo !=''">
+			and customer_info.customer_weibo like concat(concat('%', #{weibo}),'%')
+		</if>
+		<if test="taobao !=null and taobao !=''">
+			and customer_info.customer_taobao like concat(concat('%', #{taobao}),'%')
+		</if>
+		<if test="email !=null and email !=''">
+			and customer_info.customer_email like concat(concat('%', #{email}),'%')
+		</if>
+		<if test="jd !=null and jd !=''">
+			and customer_info.customer_jd like concat(concat('%', #{jd}),'%')
+		</if>
+		<if test="type !=null and type !=''">
+			and customer_info.customer_type like concat(concat('%', #{type}),'%')
+		</if>
+		
+		
+		<if test="mold !=null and mold !=''">
+			and question_info.question_mold = #{mold}
+		</if>
+		<if test="questionType !=null and questionType !=''">
+			and question_info.question_type = #{questionType}
+		</if>
+		<if test="describe !=null and describe !=''">
+			and question_info.question_describe like concat(concat('%', #{describe}),'%')
+		</if>
+		<if test="phoneImei !=null and phoneImei !=''">
+			and question_info.question_phone_imei like concat(concat('%', #{phoneImei}),'%')
+		</if>
+		<if test="phoneModel !=null and phoneModel !=''">
+			and question_info.question_phone_model = #{phoneModel}
+		</if>
+		<if test="phoneVersion !=null and phoneVersion !=''">
+			and question_info.question_phone_version = #{phoneVersion}
+		</if>
+		<if test="status !=null and status !=''">
+			and question_info.question_status =#{status}
+		</if>
+	</select>
+	
+	<resultMap type="com.dianfeng.entity.WorkOrderInfo" id="workOrderInfoMap">
+	<result column="work_order_id" property="id"/>
+	<result column="work_order_assembly_line" property="assemblyLine"/>
+	<result column="work_order_tel" property="tel"/>
+	<result column="work_order_tel_time" property="telTime"/>
+	<result column="work_order_title" property="title"/>
+	<result column="work_order_level" property="level"/>
+	<result column="work_order_feedback_time" property="feedbackTime"/>
+	<result column="work_order_feedback_type" property="feedbackType"/>
+	<result column="work_order_feedback_channel" property="feedbackChannel"/>
+	<result column="work_order_treatment_scheme" property="treatmentScheme"/>
+	<result column="work_order_final_decision" property="finalDecision"/>
+	<result column="work_order_user_agent" property="userAgent"/>
+	<result column="work_order_user_account" property="userAccount"/>
+	<result column="work_order_skill_group" property="skillGroup"/>
+	<result column="work_order_unique_id" property="uniqueId"/>
+	</resultMap>
+	
+	<resultMap type="com.dianfeng.entity.WorkOrderDetailInfo" id="workOrderDetailInfoMap">
+	<result column="customer_id" property="customerId"/>
+	<result column="customer_name" property="name"/>
+	<result column="customer_sex" property="sex"/>
+	<result column="customer_age" property="age"/>
+	<result column="customer_area" property="area"/>
+	<result column="customer_qq" property="qq"/>
+	<result column="customer_tel" property="tel"/>
+	<result column="customer_address" property="address"/>
+	<result column="customer_postal_code" property="postalCode"/>
+	<result column="customer_wechat" property="wechat"/>
+	<result column="customer_weibo" property="weibo"/>
+	<result column="customer_nickname" property="nickname"/>
+	<result column="customer_taobao" property="taobao"/>
+	<result column="customer_email" property="email"/>
+	<result column="customer_jd" property="jd"/>
+	<result column="customer_type" property="type"/>
+	<result column="customer_agent" property="agent"/>
+	<result column="customer_detail" property="detail"/>
+	
+	<result column="work_order_id" property="workOrderId"/>
+	<result column="work_order_assembly_line" property="assemblyLine"/>
+	<result column="work_order_tel" property="workOrderTel"/>
+	<result column="work_order_tel_time" property="telTime"/>
+	<result column="work_order_title" property="title"/>
+	<result column="work_order_level" property="level"/>
+	<result column="work_order_feedback_time" property="feedbackTime"/>
+	<result column="work_order_feedback_type" property="feedbackType"/>
+	<result column="work_order_feedback_channel" property="feedbackChannel"/>
+	<result column="work_order_treatment_scheme" property="treatmentScheme"/>
+	<result column="work_order_final_decision" property="finalDecision"/>
+	<result column="work_order_user_agent" property="userAgent"/>
+	<result column="work_order_user_account" property="userAccount"/>
+	<result column="work_order_skill_group" property="skillGroup"/>
+	<result column="work_order_unique_id" property="uniqueId"/>
+	
+	<result column="question_id" property="questionId"/>
+	<result column="question_mold" property="mold"/>
+	<result column="question_type" property="questionType"/>
+	<result column="question_describe" property="describe"/>
+	<result column="question_phone_imei" property="phoneImei"/>
+	<result column="question_phone_model" property="phoneModel"/>
+	<result column="question_phone_version" property="phoneVersion"/>
+	<result column="question_status" property="status"/>
+	</resultMap>
+	
+	</mapper>

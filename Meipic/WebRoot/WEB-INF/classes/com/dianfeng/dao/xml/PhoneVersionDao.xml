@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	<mapper namespace="com.dianfeng.dao.PhoneVersionDao">
+	
+	<select id="getAllPhoneVersion" resultMap="PhoneVersionMap">
+		select *,phone_version as phone_version_display from phone_version
+	</select>
+	 
+	<resultMap type="com.dianfeng.entity.PhoneVersion" id="PhoneVersionMap">
+	<result column="phone_version_id" property="id"/>
+	<result column="phone_version" property="phoneVersion"/>
+	<result column="phone_version_display" property="phoneVersionDisplay"/>
+	</resultMap>
+	
+	</mapper>

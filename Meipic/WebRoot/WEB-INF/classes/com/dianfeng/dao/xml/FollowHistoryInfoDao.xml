@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	<mapper namespace="com.dianfeng.dao.FollowHistoryInfoDao">
+	
+	<select id="getFollowHistoryInfo" parameterType="String" resultMap="followHistoryInfoMap">
+		select * from follow_history_info where follow_history_work_order_id = #{workOrderId} order by follow_history_time desc
+	</select>
+	
+	<insert id="insertFollowHistoryInfo" parameterType="com.dianfeng.entity.FollowHistoryInfo">
+		insert into follow_history_info (
+		follow_history_work_order_id,
+		follow_history_agent,
+		follow_history_account,
+		follow_history_treatment_scheme,
+		follow_history_time
+		)
+		values(
+		#{workOrderId},
+		#{agent},
+		#{account},
+		#{treatmentScheme},
+		#{time}
+		)
+	</insert>
+	
+	<resultMap type="com.dianfeng.entity.FollowHistoryInfo" id="followHistoryInfoMap">
+	<result column="follow_history_id" property="id"/>
+	<result column="follow_history_work_order_id" property="workOrderId"/>
+	<result column="follow_history_agent" property="agent"/>
+	<result column="follow_history_account" property="account"/>
+	<result column="follow_history_treatment_scheme" property="treatmentScheme"/>
+	<result column="follow_history_time" property="time"/>
+	</resultMap>
+	
+	</mapper>

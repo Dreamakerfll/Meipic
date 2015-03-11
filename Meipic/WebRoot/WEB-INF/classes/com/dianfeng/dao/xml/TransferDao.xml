@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	<mapper namespace="com.dianfeng.dao.TransferDao">
+	
+	<select id="getAllTransfer" resultMap="transferMap">
+		SELECT info_transfer_id
+		,info_transfer_starttime
+		,info_transfer_endTime,info_transfer_submitTime
+		,info_transfer_transfernum
+		,info_transfer_account
+		,info_transfer_status
+		,GROUP_CONCAT(info_transfer_area ORDER BY info_transfer_area SEPARATOR ",") AS info_transfer_area 
+		,GROUP_CONCAT(info_transfer_area_content ORDER BY info_transfer_area_content SEPARATOR ",") AS info_transfer_area_content
+		,info_transfer_batch
+		FROM info_transfer GROUP BY info_transfer_batch order by info_transfer_submitTime desc
+	</select>
+	
+	<select id="getTransferByAccount" parameterType="String" resultMap="transferMap">
+		SELECT info_transfer_id
+		,info_transfer_starttime
+		,info_transfer_endTime,info_transfer_submitTime
+		,info_transfer_transfernum
+		,info_transfer_account
+		,info_transfer_status
+		,GROUP_CONCAT(info_transfer_area ORDER BY info_transfer_area SEPARATOR ",") AS info_transfer_area 
+		,GROUP_CONCAT(info_transfer_area_content ORDER BY info_transfer_area_content SEPARATOR ",") AS info_transfer_area_content
+		,info_transfer_batch
+		FROM info_transfer
+		where info_transfer_account=#{account} GROUP BY info_transfer_batch order by info_transfer_submitTime desc
+	</select>
+	
+	<select id="getTransferByCondition" parameterType="String" resultMap="transferMap">
+		SELECT info_transfer_id
+		,info_transfer_starttime
+		,info_transfer_endTime,info_transfer_submitTime
+		,info_transfer_transfernum
+		,info_transfer_account
+		,info_transfer_status
+		,GROUP_CONCAT(info_transfer_area ORDER BY info_transfer_area SEPARATOR ",") AS info_transfer_area 
+		,GROUP_CONCAT(info_transfer_area_content ORDER BY info_transfer_area_content SEPARATOR ",") AS info_transfer_area_content
+		,info_transfer_batch
+		FROM info_transfer
+		WHERE info_transfer_batch IN (SELECT info_transfer_batch FROM info_transfer WHERE 1=1
+		<if test="area !=null and area !=''">
+		AND info_transfer_area_content LIKE concat(concat('%', #{area}),'%') 
+		</if>
+		<if test="beginTime !=null and beginTime !=''">
+		AND info_transfer_starttime &gt;=#{beginTime} 
+		</if>
+		<if test="endTime !=null and endTime !=''">
+		AND info_transfer_endTime &lt;=#{endTime} 
+		</if>
+		<if test="phoneNumber !=null and phoneNumber !=''">
+		AND info_transfer_transfernum LIKE concat(concat('%', #{phoneNumber}),'%') 
+		</if>
+		<if test="account !=null and account !=''">
+		AND info_transfer_account LIKE concat(concat('%', #{account}),'%') 
+		</if>
+		GROUP BY info_transfer_batch)
+		GROUP BY info_transfer_batch
+		order by info_transfer_submitTime desc
+	</select>
+	
+	<select id="isAreaExist" resultType="String">
+		SELECT GROUP_CONCAT(info_transfer_area_content ORDER BY info_transfer_area_content SEPARATOR ",") AS info_transfer_area_content 
+		FROM info_transfer 
+		WHERE info_transfer_area IN
+				<foreach item="areaList" index="index" collection="areaList"   
+                         open="(" separator="," close=")">  
+                        #{areaList}  
+                </foreach>
+	</select>
+	
+	<insert id="addTransfer">
+		insert into info_transfer (
+		info_transfer_startTime,
+		info_transfer_endTime,
+		info_transfer_submitTime,
+		info_transfer_transfernum,
+		info_transfer_account,
+		info_transfer_status,
+		info_transfer_area,
+		info_transfer_area_content,
+		info_transfer_batch) values
+		<foreach collection="transferList" item="item" index="index" separator=",">
+		(#{item.beginTime},
+		#{item.endTime},
+		#{item.submitTime},
+		#{item.transferNumber},
+		#{item.account},
+		#{item.status},
+		#{item.transferAreaId},
+		#{item.transferArea},
+		#{item.transferBatch})
+		 </foreach>  
+	</insert>
+	
+	<delete id="deleteTransferByBatchId">
+		delete from info_transfer where info_transfer_batch = #{batchId}
+	</delete>
+	
+	<update id="updateStatusByBatchId" parameterType="String">
+		update info_transfer set 
+		info_transfer_status=#{status}
+		where info_transfer_batch=#{batchId}
+	</update>
+	 
+	<resultMap type="com.dianfeng.entity.Transfer" id="transferMap">
+	<result column="info_transfer_id" property="id"/>
+	<result column="info_transfer_startTime" property="beginTime"/>
+	<result column="info_transfer_endTime" property="endTime"/>
+	<result column="info_transfer_submitTime" property="submitTime"/>
+	<result column="info_transfer_transfernum" property="transferNumber"/>
+	<result column="info_transfer_account" property="account"/>
+	<result column="info_transfer_status" property="status"/>
+	<result column="info_transfer_area" property="transferAreaId"/>
+	<result column="info_transfer_area_content" property="transferArea"/>
+	<result column="info_transfer_batch" property="transferBatch"/>
+	<result column="inter_account" property="account"/>
+	</resultMap>
+	
+	</mapper>
+<!--<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	<mapper namespace="com.dianfeng.dao.TransferDao">
+	
+	<select id="getAllTransfer" resultMap="transferMap">
+		SELECT transfer_id
+		,transfer_begin_time
+		,transfer_end_time,transfer_submitTime
+		,transfer_tel
+		,transfer_account
+		,transfer_status
+		,GROUP_CONCAT(transfer_area ORDER BY transfer_area SEPARATOR ",") AS transfer_area 
+		,GROUP_CONCAT(transfer_area_content ORDER BY transfer_area_content SEPARATOR ",") AS transfer_area_content
+		,transfer_batch
+		FROM transfer_info GROUP BY transfer_batch order by transfer_submitTime desc
+	</select>
+	
+	<select id="getTransferByAccount" parameterType="String" resultMap="transferMap">
+		SELECT transfer_id
+		,transfer_begin_time
+		,transfer_end_time
+		,transfer_submitTime
+		,transfer_tel
+		,transfer_account
+		,transfer_status
+		,GROUP_CONCAT(transfer_area ORDER BY transfer_area SEPARATOR ",") AS transfer_area 
+		,GROUP_CONCAT(transfer_area_content ORDER BY transfer_area_content SEPARATOR ",") AS transfer_area_content
+		,transfer_batch
+		FROM transfer_info
+		where transfer_account=#{account} GROUP BY transfer_batch order by transfer_submitTime desc
+	</select>
+	
+	<select id="getTransferByCondition" parameterType="String" resultMap="transferMap">
+		SELECT transfer_id
+		,transfer_begin_time
+		,transfer_end_time,transfer_submitTime
+		,transfer_tel
+		,transfer_account
+		,transfer_status
+		,GROUP_CONCAT(transfer_area ORDER BY transfer_area SEPARATOR ",") AS transfer_area 
+		,GROUP_CONCAT(transfer_area_content ORDER BY transfer_area_content SEPARATOR ",") AS transfer_area_content
+		,transfer_batch
+		FROM transfer_info
+		WHERE transfer_batch IN (SELECT transfer_batch FROM transfer_info WHERE 1=1
+		<if test="area !=null and area !=''">
+		AND transfer_area_content LIKE concat(concat('%', #{area}),'%') 
+		</if>
+		<if test="beginTime !=null and beginTime !=''">
+		AND transfer_begin_time &gt;=#{beginTime} 
+		</if>
+		<if test="endTime !=null and endTime !=''">
+		AND transfer_end_time &lt;=#{endTime} 
+		</if>
+		<if test="phoneNumber !=null and phoneNumber !=''">
+		AND transfer_tel LIKE concat(concat('%', #{phoneNumber}),'%') 
+		</if>
+		<if test="account !=null and account !=''">
+		AND transfer_account LIKE concat(concat('%', #{account}),'%') 
+		</if>
+		GROUP BY transfer_batch)
+		GROUP BY transfer_batch
+		order by transfer_submitTime desc
+	</select>
+	
+	<select id="isAreaExist" resultType="String">
+		SELECT GROUP_CONCAT(transfer_area_content ORDER BY transfer_area_content SEPARATOR ",") AS transfer_area_content 
+		FROM transfer_info 
+		WHERE transfer_area IN
+				<foreach item="areaList" index="index" collection="areaList"   
+                         open="(" separator="," close=")">  
+                        #{areaList}  
+                </foreach>
+	</select>
+	
+	<insert id="addTransfer">
+		insert into transfer_info (
+		transfer_begin_time,
+		transfer_end_time,
+		transfer_submitTime,
+		transfer_tel,
+		transfer_account,
+		transfer_status,
+		transfer_area,
+		transfer_area_content,
+		transfer_batch) values
+		<foreach collection="transferList" item="item" index="index" separator=",">
+		(#{item.beginTime},
+		#{item.endTime},
+		#{item.submitTime},
+		#{item.transferNumber},
+		#{item.account},
+		#{item.status},
+		#{item.transferAreaId},
+		#{item.transferArea},
+		#{item.transferBatch})
+		 </foreach>  
+	</insert>
+	
+	<delete id="deleteTransferByBatchId">
+		delete from transfer_info where transfer_batch = #{batchId}
+	</delete>
+	
+	<update id="updateStatusByBatchId" parameterType="String">
+		update transfer_info set 
+		transfer_status=#{status}
+		where transfer_batch=#{batchId}
+	</update>
+	 
+	<resultMap type="com.dianfeng.entity.Transfer" id="transferMap">
+	<result column="transfer_id" property="id"/>
+	<result column="transfer_begin_time" property="beginTime"/>
+	<result column="transfer_end_time" property="endTime"/>
+	<result column="transfer_submitTime" property="submitTime"/>
+	<result column="transfer_tel" property="transferNumber"/>
+	<result column="transfer_account" property="account"/>
+	<result column="transfer_status" property="status"/>
+	<result column="transfer_area" property="transferAreaId"/>
+	<result column="transfer_area_content" property="transferArea"/>
+	<result column="transfer_batch" property="transferBatch"/>
+	<result column="inter_account" property="account"/>
+	</resultMap>
+	
+	</mapper>-->

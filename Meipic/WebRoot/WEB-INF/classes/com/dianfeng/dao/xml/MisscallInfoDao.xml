@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	<mapper namespace="com.dianfeng.dao.MisscallInfoDao">
+	
+	<select id="getAllMisscall" resultMap="misscallMap">
+		SELECT *,user_info.user_name AS person_to_display FROM info_callRecords LEFT OUTER JOIN user_info ON info_callRecords.info_callRecords_operator = user_info.user_agent WHERE info_is_display = '0' AND info_callRecords_disposition = 'NO ANSWER' AND info_callRecords_callType = 'in'
+	</select>
+	
+	<select id="getMisscallByCondition" parameterType="String" resultMap="misscallMap">
+		SELECT *,user_info.user_name AS person_to_display FROM info_callRecords LEFT OUTER JOIN user_info ON info_callRecords.info_callRecords_operator = user_info.user_agent
+		where 1=1
+		<if test="beginTime !=null and beginTime !=''">
+			and info_callRecords_recordDay &gt;= #{beginTime}
+		</if>
+		<if test="endTime !=null and endTime !=''">
+			and info_callRecords_recordDay &lt;= #{endTime}
+		</if>
+		<if test="phoneNumber !=null and phoneNumber !=''">
+			and info_callRecords_callers LIKE concat(concat('%', #{phoneNumber}),'%') 
+		</if>
+		<if test="phoneNumber_called !=null and phoneNumber_called !=''">
+			and info_callRecords_answers LIKE concat(concat('%', #{phoneNumber_called}),'%') 
+		</if>
+			and info_is_display = '0' 
+			AND info_callRecords_disposition = 'NO ANSWER'
+			AND info_callRecords_callType = 'in'
+	</select>
+	
+	<update id="updateAccountById" parameterType="String">
+		update info_callRecords set 
+		info_callRecords_operator=#{account}
+		where info_callRecords_id=#{id}
+	</update>
+	
+	<update id="updateMisscallStatus" parameterType="String">
+		update info_callRecords set info_is_display = '1' where info_callRecords_id=#{id}
+		
+	</update>
+	 
+	<resultMap type="com.dianfeng.entity.MisscallInfo" id="misscallMap">
+	<result column="info_callRecords_id" property="id"/>
+	<result column="info_callRecords_account" property="account"/>
+	<result column="info_callRecords_agent" property="agentNumber"/>
+	<result column="info_callRecords_recordDay" property="answerTime"/>
+	<result column="info_callRecords_callType" property="callType"/>
+	<result column="info_callRecords_callers" property="caller"/>
+	<result column="info_callRecords_answers" property="answer"/>
+	<result column="info_callRecords_holdtime" property="ringSec"/>
+	<result column="info_callRecords_billsec" property="holdSec"/>
+	<result column="info_callRecords_disposition" property="disposition"/>
+	<result column="info_callRecords_recordPath" property="recordPath"/>
+	<result column="info_callRecords_uniqueId" property="uniqueId"/>
+	<result column="info_callRecords_isanswer" property="isAnswer"/>
+	<result column="info_callRecords_operator" property="operator"/>
+	<result column="info_is_display" property="isDisplay"/>
+	<result column="person_to_display" property="personToDisplay"/>
+	</resultMap>
+	
+	</mapper>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	<mapper namespace="com.dianfeng.dao.AreaInfoDao">
+	
+	<select id="getAllArea" resultMap="areaInfoMap">
+		select area_provice,area_city,area_code from area_info group by area_code order by area_provice
+	</select>
+	
+	<select id="getAreaByCode" resultMap="areaMap">
+		SELECT *,SUBSTRING_INDEX(MobileArea,' ',1) AS Province,SUBSTRING_INDEX(MobileArea,' ',-1) AS City FROM asteriskcdrdb.List WHERE AreaCode like concat(#{tel},'%') GROUP BY city
+	</select>
+	
+	<select id="getAreaByPhone" resultMap="areaMap">
+		SELECT *,SUBSTRING_INDEX(MobileArea,' ',1) AS Province,SUBSTRING_INDEX(MobileArea,' ',-1) AS City FROM asteriskcdrdb.List WHERE MobileNumber = #{tel}
+	</select>
+	
+	<resultMap type="com.dianfeng.entity.AreaInfo" id="areaInfoMap">
+	<result column="area_id" property="id"/>
+	<result column="area_code" property="code"/>
+	<result column="area_provice" property="province"/>
+	<result column="area_city" property="city"/>
+	</resultMap>
+	 
+	<resultMap type="com.dianfeng.entity.AreaInfo" id="areaMap">
+	<result column="ListID" property="id"/>
+	<result column="AreaCode" property="code"/>
+	<result column="Province" property="province"/>
+	<result column="City" property="city"/>
+	<result column="PostCode" property="postCode"/>
+	</resultMap>
+	
+	</mapper>

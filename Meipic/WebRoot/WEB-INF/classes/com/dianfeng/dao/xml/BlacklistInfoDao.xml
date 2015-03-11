@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	<mapper namespace="com.dianfeng.dao.BlacklistInfoDao">
+	
+	<select id="getAllBlacklist" resultMap="blacklistMap">
+		select * from info_black order by info_black_submit_time desc
+	</select>
+	 
+	<select id="getBlacklistByCondition" parameterType="String" resultMap="blacklistMap">
+		select * from info_black where 1=1
+		<if test="beginTime !=null and beginTime !=''">
+			and info_black_start_time &gt;= #{beginTime}
+		</if>
+		<if test="endTime !=null and endTime !=''">
+			and info_black_end_time &lt;= #{endTime}
+		</if>
+		<if test="phoneNumber !=null and phoneNumber !=''">
+			and info_black_callId like concat(concat('%', #{phoneNumber}),'%')
+		</if>
+		<if test="submitPerson !=null and submitPerson !=''">
+			and info_black_submit_person like concat(concat('%', #{submitPerson}),'%')
+		</if>
+		<if test="agentComment !=null and agentComment !=''">
+			and info_black_agent_comment like concat(concat('%', #{agentComment}),'%')
+		</if>
+		<if test="status !=null and status !=''">
+			and info_black_status = #{status}
+		</if>
+		
+		order by info_black_submit_time desc
+	</select>
+	
+	<delete id="deleteBlacklistById" parameterType="String">
+		delete from info_black where info_black_id=#{id}
+	</delete>
+	
+	<insert id="addBlacklist" parameterType="String">
+		insert into info_black (
+		info_black_start_time,
+		info_black_end_time,
+		info_black_callId,
+		info_black_agent_comment,
+		info_black_status,
+		info_black_submit_person,
+		info_black_submit_time
+		)
+		values(
+		#{beginTime},
+		#{endTime},
+		#{phoneNumber},
+		#{agentComment},
+		'0',
+		#{submitPerson},
+		#{submitTime}
+		)
+	</insert>
+	
+	<update id="editBlacklist" parameterType="String">
+		update info_black set 
+		info_black_start_time = #{beginTime},
+		info_black_end_time = #{endTime},
+		info_black_callId = #{phoneNumber},
+		info_black_agent_comment = #{agentComment}
+		where info_black_id = #{id}
+	</update>
+	
+	<update id="updateBlacklist" parameterType="String">
+		update info_black set 
+		info_black_status = #{status},
+		info_black_monitor_comment=#{monitorComment},
+		info_black_check_person=#{account} 
+		where info_black_id=#{id}
+	</update>
+	
+	<resultMap type="com.dianfeng.entity.BlacklistInfo" id="blacklistMap">
+	<result column="info_black_id" property="id"/>
+	<result column="info_black_start_time" property="beginTime"/>
+	<result column="info_black_end_time" property="endTime"/>
+	<result column="info_black_callId" property="phoneNumber"/>
+	<result column="info_black_agent_comment" property="agentComment"/>
+	<result column="info_black_status" property="status"/>
+	<result column="info_black_submit_person" property="submitPerson"/>
+	<result column="info_black_check_person" property="checkPerson"/>
+	<result column="info_black_monitor_comment" property="monitorComment"/>
+	<result column="info_black_submit_time" property="submitTime"/>
+	</resultMap>
+	
+	</mapper>
+	
+	
+<!--<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	<mapper namespace="com.dianfeng.dao.BlacklistInfoDao">
+	
+	<select id="getAllBlacklist" resultMap="blacklistMap">
+		select * from blacklist_info order by blacklist_submit_time desc
+	</select>
+	 
+	<select id="getBlacklistByCondition" parameterType="String" resultMap="blacklistMap">
+		select * from blacklist_info where 1=1
+		<if test="beginTime !=null and beginTime !=''">
+			and blacklist_begin_time &gt;= #{beginTime}
+		</if>
+		<if test="endTime !=null and endTime !=''">
+			and blacklist_end_time &lt;= #{endTime}
+		</if>
+		<if test="phoneNumber !=null and phoneNumber !=''">
+			and blacklist_tel like concat(concat('%', #{phoneNumber}),'%')
+		</if>
+		<if test="submitPerson !=null and submitPerson !=''">
+			and blacklist_submit_person like concat(concat('%', #{submitPerson}),'%')
+		</if>
+		<if test="agentComment !=null and agentComment !=''">
+			and blacklist_agent_comment like concat(concat('%', #{agentComment}),'%')
+		</if>
+		<if test="status !=null and status !=''">
+			and blacklist_status = #{status}
+		</if>
+		
+		order by blacklist_submit_time desc
+	</select>
+	
+	<delete id="deleteBlacklistById" parameterType="String">
+		delete from blacklist_info where blacklist_id=#{id}
+	</delete>
+	
+	<insert id="addBlacklist" parameterType="String">
+		insert into blacklist_info (
+		blacklist_begin_time,
+		blacklist_end_time,
+		blacklist_tel,
+		blacklist_agent_comment,
+		blacklist_status,
+		blacklist_submit_person,
+		blacklist_submit_time
+		)
+		values(
+		#{beginTime},
+		#{endTime},
+		#{phoneNumber},
+		#{agentComment},
+		'0',
+		#{submitPerson},
+		#{submitTime}
+		)
+	</insert>
+	
+	<update id="updateBlacklist">
+		update blacklist_info set 
+		blacklist_status = #{status},
+		blacklist_monitor_comment=#{monitorComment},
+		blacklist_check_person=#{account} 
+		where blacklist_id=#{id}
+	</update>
+	
+	<resultMap type="com.dianfeng.entity.BlacklistInfo" id="blacklistMap">
+	<result column="blacklist_id" property="id"/>
+	<result column="blacklist_begin_time" property="beginTime"/>
+	<result column="blacklist_end_time" property="endTime"/>
+	<result column="blacklist_tel" property="phoneNumber"/>
+	<result column="blacklist_agent_comment" property="agentComment"/>
+	<result column="blacklist_status" property="status"/>
+	<result column="blacklist_submit_person" property="submitPerson"/>
+	<result column="blacklist_check_person" property="checkPerson"/>
+	<result column="blacklist_monitor_comment" property="monitorComment"/>
+	<result column="blacklist_submit_time" property="submitTime"/>
+	</resultMap>
+	
+	</mapper>-->
+	

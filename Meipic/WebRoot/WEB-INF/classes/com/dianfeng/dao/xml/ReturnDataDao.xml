@@ -1,0 +1,824 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	<mapper namespace="com.dianfeng.dao.ReturnDataDao">
+	
+	<select id="findAllDepartment"  resultType="com.dianfeng.entity.back.ReturnDepartment">
+		select department_Id departmentId,department_Name departmentName from department_info;
+	</select>
+	<select id="findAllSeat"  resultType="com.dianfeng.entity.back.ReturnSeat">
+		SELECT 
+			user_agent AS seatId,
+			user_name AS seatName
+		FROM user_info;
+	</select>
+	
+	<select id="findAllSeatByAccount"  resultType="com.dianfeng.entity.back.ReturnSeat">
+		SELECT 
+			user_account AS seatId,
+			user_name AS seatName
+		FROM user_info;
+	</select>
+	
+	<!-- 第一层 -->
+	<!--在线时长 OK  -->
+	<select id="seatTimeReport"  resultType="com.dianfeng.entity.back.data.SeatTimeData">
+		SELECT 
+			IFNULL(ROUND(SUM(IFNULL(action_record_interval_time,0))),0) AS intervalTime,
+			DATE(action_record_begin_time) AS selectDay,
+			action_record_agent AS seatNumber,
+			action_record_status AS status
+		FROM  action_record_info 
+		WHERE action_record_agent != '注销' 
+		<if test="startTime !=null and startTime!=''">
+			and action_record_begin_time &gt;=#{startTime} 
+		</if>
+		<if test="endTime !=null and endTime!=''">
+			and action_record_begin_time &lt;= #{endTime}
+		</if>
+		<if test="seatNumber !=null and seatNumber!=''">
+			and action_record_account = #{seatNumber}
+		</if>
+		GROUP BY  DATE(action_record_begin_time) DESC,action_record_agent,action_record_status;
+	</select>
+	
+	<!--在线明细 OK  -->
+	<select id="onLineDetailReport"  resultType="com.dianfeng.entity.back.ReturnOnLineDetailReport">
+		SELECT 
+			action_record_account AS seatNumber,
+			action_record_begin_time AS startTime,
+			action_record_end_time AS endTime,
+			action_record_status AS status,
+			action_record_interval_time AS betweenTime
+		FROM  action_record_info 
+		WHERE action_record_agent != '注销' 
+		<if test="startTime !=null and startTime!=''">
+			and action_record_begin_time &gt;=#{startTime} 
+		</if>
+		<if test="endTime !=null and endTime!=''">
+			and action_record_begin_time &lt;= #{endTime}
+		</if>
+		<if test="seatNumber !=null and seatNumber!=''">
+			and action_record_account = #{seatNumber}
+		</if>
+		ORDER BY action_record_id DESC;
+	</select>
+	
+	<!-- 满意度详细报表 -->
+	<select id="satisfactionDetailReport"  resultType="com.dianfeng.entity.back.ReturnSatisfactionDetailReport">
+			SELECT 
+				info_callRecords_group AS department,
+				info_callRecords_account AS seatName,
+				info_callRecords_agent AS agentNumber,
+				records_type recordType,
+				case 
+					when info_callRecords_callType='in' 
+					then info_callRecords_callers
+					else info_callRecords_answers end AS callNumber,
+				info_callRecords_recordDay AS callDay,
+				asteriskcdrdb.evaluate.Evaluate AS evaluationLevel,
+				info_callRecords_recordPath AS playPath 
+			FROM info_callRecords 
+			LEFT JOIN asteriskcdrdb.evaluate
+			on info_callRecords.info_callRecords_uniqueId = asteriskcdrdb.evaluate.UniqueId 
+			LEFT JOIN records_type
+			on info_callRecords.info_callRecords_uniqueId = records_type.records_uniqueId 
+			WHERE info_callRecords_disposition = 'ANSWERED'
+			<if test="startTime !=null and startTime!=''">
+				and info_callRecords_recordDay &gt;=#{startTime} 
+			</if>
+			<if test="endTime !=null and endTime!=''">
+				and info_callRecords_recordDay &lt;= #{endTime}
+			</if>
+			<if test="seatNumber !=null and seatNumber!=''">
+				and info_callRecords_account = #{seatNumber}
+			</if>
+			<if test="evaluationLevel !=null and evaluationLevel!=''">
+				and asteriskcdrdb.evaluate.Evaluate = #{evaluationLevel}
+			</if>
+			ORDER BY info_callRecords_recordDay DESC;
+	</select>
+	
+	<select id="satisfactionDetailReportUserNotClick"  resultType="com.dianfeng.entity.back.ReturnSatisfactionDetailReport">
+			SELECT 
+				info_callRecords_group AS department,
+				info_callRecords_account AS seatName,
+				info_callRecords_agent AS agentNumber,
+				records_type recordType,
+				case 
+					when info_callRecords_callType='in' 
+					then info_callRecords_callers
+					else info_callRecords_answers end AS callNumber,
+				info_callRecords_recordDay AS callDay,
+				asteriskcdrdb.evaluate.Evaluate AS evaluationLevel,
+				info_callRecords_recordPath AS playPath 
+			FROM info_callRecords 
+			LEFT JOIN asteriskcdrdb.evaluate
+			on info_callRecords.info_callRecords_uniqueId = asteriskcdrdb.evaluate.UniqueId 
+			LEFT JOIN records_type
+			on info_callRecords.info_callRecords_uniqueId = records_type.records_uniqueId 
+			WHERE info_callRecords_disposition = 'ANSWERED'   AND  !isNULL(records_type) AND ISNULL(asteriskcdrdb.evaluate.Evaluate)
+			<if test="startTime !=null and startTime!=''">
+				and info_callRecords_recordDay &gt;=#{startTime} 
+			</if>
+			<if test="endTime !=null and endTime!=''">
+				and info_callRecords_recordDay &lt;= #{endTime}
+			</if>
+			<if test="seatNumber !=null and seatNumber!=''">
+				and info_callRecords_account = #{seatNumber}
+			</if>
+			ORDER BY info_callRecords_recordDay DESC;
+	</select>
+	
+	<select id="satisfactionDetailReportSeatNotClick"  resultType="com.dianfeng.entity.back.ReturnSatisfactionDetailReport">
+			SELECT 
+				info_callRecords_group AS department,
+				info_callRecords_account AS seatName,
+				info_callRecords_agent AS agentNumber,
+				records_type recordType,
+				case 
+					when info_callRecords_callType='in' 
+					then info_callRecords_callers
+					else info_callRecords_answers end AS callNumber,
+				info_callRecords_recordDay AS callDay,
+				asteriskcdrdb.evaluate.Evaluate AS evaluationLevel,
+				info_callRecords_recordPath AS playPath 
+			FROM info_callRecords 
+			LEFT JOIN asteriskcdrdb.evaluate
+			on info_callRecords.info_callRecords_uniqueId = asteriskcdrdb.evaluate.UniqueId 
+			LEFT JOIN records_type
+			on info_callRecords.info_callRecords_uniqueId = records_type.records_uniqueId 
+			WHERE info_callRecords_disposition = 'ANSWERED'  AND  ISNULL(records_type) AND ISNULL(asteriskcdrdb.evaluate.Evaluate)
+			<if test="startTime !=null and startTime!=''">
+				and info_callRecords_recordDay &gt;=#{startTime} 
+			</if>
+			<if test="endTime !=null and endTime!=''">
+				and info_callRecords_recordDay &lt;= #{endTime}
+			</if>
+			<if test="seatNumber !=null and seatNumber!=''">
+				and info_callRecords_account = #{seatNumber}
+			</if>
+			ORDER BY info_callRecords_recordDay DESC;
+	</select>
+	
+	<!-- MISSCALL -->
+	<select id="missCallReport"  resultType="com.dianfeng.entity.back.ReturnMissCallReport">
+			SELECT
+				info_callRecords_recordDay callTime,
+				info_callRecords_callers callNumber,
+				info_callRecords_account seatNumber,
+				info_callRecords_holdtime holdTime 
+			FROM info_callRecords 
+			WHERE info_callRecords_callType = 'in' AND info_callRecords_disposition = 'NO ANSWER'
+			<if test="startTime !=null and startTime!=''">
+				and info_callRecords_recordDay &gt;=#{startTime} 
+			</if>
+			<if test="endTime !=null and endTime!=''">
+				and info_callRecords_recordDay &lt;= #{endTime}
+			</if>
+			<if test="seatNumber !=null and seatNumber!=''">
+				and info_callRecords_account = #{seatNumber}
+			</if>
+			<if test="callNumber !=null and callNumber!=''">
+				and info_callRecords_callers = #{callNumber}
+			</if>
+			ORDER BY info_callRecords_recordDay DESC;
+	</select>
+	
+	<!-- 第二层 -->
+	<select id="seatWorkDayReportData"  resultType="com.dianfeng.entity.back.data.SeatWorkData">
+		<if test="hour==30">
+			SELECT 
+				DATE(info_callRecords_recordDay) selectDay,
+				CASE 
+				WHEN MINUTE(info_callRecords_recordDay) &lt; 30 
+				THEN CONCAT(hour(info_callRecords_recordDay),":00-",hour(info_callRecords_recordDay),":30")
+				ELSE CONCAT(hour(info_callRecords_recordDay),":30-",hour(info_callRecords_recordDay)+1,":00") END hour,
+				info_callRecords_disposition disposition,
+				info_callRecords_callType callType,
+				COUNT(info_callRecords_id) count,
+				SUM(info_callRecords_billsec) sum
+			FROM info_callRecords 
+			WHERE info_callRecords_account = #{seatNumber} AND date(info_callRecords_recordDay) =  #{selectDay}
+			GROUP BY 
+			DATE(info_callRecords_recordDay),
+			HOUR(info_callRecords_recordDay),
+			CASE WHEN MINUTE(info_callRecords_recordDay) &lt; 30 THEN 1 ELSE 2 END,
+			CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+			CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END 
+			ORDER BY info_callRecords_recordDay
+		</if>
+		<if test="hour==1">
+			SELECT 
+				DATE(info_callRecords_recordDay) selectDay,
+				CONCAT(hour(info_callRecords_recordDay),":00","-",hour(info_callRecords_recordDay)+1,":00") hour,
+				info_callRecords_disposition disposition,
+				info_callRecords_callType callType,
+				COUNT(info_callRecords_id) count,
+				SUM(info_callRecords_billsec) sum
+			FROM info_callRecords 
+			WHERE info_callRecords_account = #{seatNumber} AND date(info_callRecords_recordDay) =  #{selectDay}
+			GROUP BY 
+			DATE(info_callRecords_recordDay),
+			HOUR(info_callRecords_recordDay),
+			CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+			CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END 
+			ORDER BY info_callRecords_recordDay
+		</if>
+		<if test="hour==2">
+			SELECT 
+				DATE(info_callRecords_recordDay) selectDay,
+				CASE 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 2 THEN '00:00-02:00' 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 4 THEN '02:00-04:00' 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 6 THEN '04:00-06:00' 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 8 THEN '06:00-08:00' 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 10 THEN '08:00-10:00' 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 12 THEN '10:00-12:00' 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 14 THEN '12:00-14:00' 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 16 THEN '14:00-16:00' 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 18 THEN '16:00-18:00' 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 20 THEN '18:00-20:00' 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 22 THEN '20:00-22:00' 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 24 THEN '22:00-24:00' 
+				ELSE 13 END hour,
+				info_callRecords_disposition disposition,
+				info_callRecords_callType callType,
+				COUNT(info_callRecords_id) count,
+				SUM(info_callRecords_billsec) sum
+			FROM info_callRecords 
+			WHERE info_callRecords_account = #{seatNumber} AND date(info_callRecords_recordDay) =  #{selectDay}
+			GROUP BY 
+			date(info_callRecords_recordDay),
+			CASE 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 2 THEN 1 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 4 THEN 2 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 6 THEN 3 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 8 THEN 4 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 10 THEN 5 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 12 THEN 6 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 14 THEN 7 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 16 THEN 8 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 18 THEN 9 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 20 THEN 10 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 22 THEN 11 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 24 THEN 12 
+			ELSE 13 END,
+			CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+			CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END 
+			ORDER BY info_callRecords_recordDay
+		</if>
+		<if test="hour==4">
+			SELECT 
+				DATE(info_callRecords_recordDay) selectDay,
+				CASE 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 4 THEN '00:00-04:00' 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 8 THEN '04:00-08:00' 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 12 THEN '08:00-12:00' 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 16 THEN '12:00-16:00' 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 20 THEN '16:00-20:00' 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 24 THEN '20:00-24:00' 
+				ELSE 13 END hour,
+				info_callRecords_disposition disposition,
+				info_callRecords_callType callType,
+				COUNT(info_callRecords_id) count,
+				SUM(info_callRecords_billsec) sum
+			FROM info_callRecords 
+			WHERE info_callRecords_account = #{seatNumber} AND date(info_callRecords_recordDay) =  #{selectDay}
+			GROUP BY 
+			date(info_callRecords_recordDay),
+			CASE 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 4 THEN 1 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 8 THEN 2 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 12 THEN 3 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 16 THEN 4 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 20 THEN 5 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 24 THEN 6 
+			ELSE 7 END,
+			CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+			CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END 
+			ORDER BY info_callRecords_recordDay
+		</if>
+		<if test="hour==8">
+			SELECT 
+				DATE(info_callRecords_recordDay) selectDay,
+				CASE 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 8 THEN '00:00-08:00' 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 16 THEN '08:00-16:00' 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 24 THEN '16:00-24:00' 
+				ELSE 13 END hour,
+				info_callRecords_disposition disposition,
+				info_callRecords_callType callType,
+				COUNT(info_callRecords_id) count,
+				SUM(info_callRecords_billsec) sum
+			FROM info_callRecords 
+			WHERE info_callRecords_account = #{seatNumber} AND date(info_callRecords_recordDay) =  #{selectDay}
+			GROUP BY 
+			date(info_callRecords_recordDay),
+			CASE 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 8 THEN 1 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 16 THEN 2 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 24 THEN 3 
+			ELSE 4 END,
+			CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+			CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END 
+			ORDER BY info_callRecords_recordDay
+		</if>
+		<if test="hour==12">
+			SELECT 
+				DATE(info_callRecords_recordDay) selectDay,
+			CASE 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 12 THEN '00:00-12:00' 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 24 THEN '12:00-24:00' 
+			ELSE 13 END hour,
+				info_callRecords_disposition disposition,
+				info_callRecords_callType callType,
+				COUNT(info_callRecords_id) count,
+				SUM(info_callRecords_billsec) sum
+			FROM info_callRecords 
+			WHERE info_callRecords_account = #{seatNumber} AND date(info_callRecords_recordDay) =  #{selectDay}
+			GROUP BY 
+			date(info_callRecords_recordDay),
+			CASE 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 12 THEN 1
+			WHEN HOUR(info_callRecords_recordDay) &lt; 24 THEN 2 
+			ELSE 3 END,
+			CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+			CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END 
+			ORDER BY info_callRecords_recordDay
+		</if>
+	</select>
+	
+	<!-- 坐席个人工作量周报表  -->
+	<select id="seatWorkWeekReportData"  resultType="com.dianfeng.entity.back.data.SeatWorkData">
+			SELECT 
+				DATE(info_callRecords_recordDay) selectDay,
+				info_callRecords_disposition disposition,
+				info_callRecords_callType callType,
+				COUNT(info_callRecords_id) count,
+				SUM(info_callRecords_billsec) sum
+			FROM info_callRecords 
+			WHERE info_callRecords_account = #{seatNumber} AND YEAR(info_callRecords_recordDay) = YEAR(#{selectDay}) 
+			AND MONTH(info_callRecords_recordDay) = MONTH(#{selectDay}) AND WEEK(info_callRecords_recordDay) = WEEK(#{selectDay})
+			GROUP BY 
+			date(info_callRecords_recordDay),
+			CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+			CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END 
+			ORDER BY info_callRecords_recordDay
+	</select>
+	<select id="seatWorkMonthReportData"  resultType="com.dianfeng.entity.back.data.SeatWorkData">
+			SELECT 
+				DATE(info_callRecords_recordDay) selectDay,
+				info_callRecords_disposition disposition,
+				info_callRecords_callType callType,
+				COUNT(info_callRecords_id) count,
+				SUM(info_callRecords_billsec) sum
+			FROM info_callRecords 
+			WHERE info_callRecords_account =  #{seatNumber} AND YEAR(info_callRecords_recordDay) = YEAR(#{selectDay}) AND MONTH(info_callRecords_recordDay) = MONTH(#{selectDay}) 
+			GROUP BY 
+			date(info_callRecords_recordDay),
+			CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+			CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END 
+			ORDER BY info_callRecords_recordDay
+	</select>
+	
+	<!-- 第三层 -->
+	<select id="departmentDayReportData"  resultType="com.dianfeng.entity.back.data.DepartmentData">
+			<if test="hour==30">
+				SELECT 
+					CASE 
+						WHEN MINUTE(info_callRecords_recordDay) &lt; 30 
+						THEN CONCAT(hour(info_callRecords_recordDay),":00-",hour(info_callRecords_recordDay),":30")
+						ELSE CONCAT(hour(info_callRecords_recordDay),":30-",hour(info_callRecords_recordDay)+1,":00") END hour,
+					info_callRecords_disposition disposition,
+					info_callRecords_callType callType,
+					COUNT(info_callRecords_id) count,
+					SUM(info_callRecords_billsec) sum
+				FROM info_callRecords 
+				WHERE info_callRecords_group = #{departmentName} AND DATE(info_callRecords_recordDay) = #{selectDay}
+				GROUP BY 
+				HOUR(info_callRecords_recordDay),
+				CASE WHEN MINUTE(info_callRecords_recordDay) &lt; 30 THEN 1 ELSE 2 END,
+				CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+				CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END 
+				ORDER BY info_callRecords_recordDay
+			</if>
+			<if test="hour==1">
+				SELECT 
+					CONCAT(hour(info_callRecords_recordDay),":00","-",hour(info_callRecords_recordDay)+1,":00") hour,
+					info_callRecords_disposition disposition,
+					info_callRecords_callType callType,
+					COUNT(info_callRecords_id) count,
+					SUM(info_callRecords_billsec) sum
+				FROM info_callRecords 
+				WHERE info_callRecords_group = #{departmentName} AND  DATE(info_callRecords_recordDay) = #{selectDay}
+				GROUP BY 
+				HOUR(info_callRecords_recordDay),
+				CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+				CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END 
+				ORDER BY info_callRecords_recordDay
+			</if>
+			<if test="hour==2">
+				SELECT 
+					CASE 
+						WHEN HOUR(info_callRecords_recordDay) &lt; 2 THEN '00:00-02:00' 
+						WHEN HOUR(info_callRecords_recordDay) &lt; 4 THEN '02:00-04:00' 
+						WHEN HOUR(info_callRecords_recordDay) &lt; 6 THEN '04:00-06:00' 
+						WHEN HOUR(info_callRecords_recordDay) &lt; 8 THEN '06:00-08:00' 
+						WHEN HOUR(info_callRecords_recordDay) &lt; 10 THEN '08:00-10:00' 
+						WHEN HOUR(info_callRecords_recordDay) &lt; 12 THEN '10:00-12:00' 
+						WHEN HOUR(info_callRecords_recordDay) &lt; 14 THEN '12:00-14:00' 
+						WHEN HOUR(info_callRecords_recordDay) &lt; 16 THEN '14:00-16:00' 
+						WHEN HOUR(info_callRecords_recordDay) &lt; 18 THEN '16:00-18:00' 
+						WHEN HOUR(info_callRecords_recordDay) &lt; 20 THEN '18:00-20:00' 
+						WHEN HOUR(info_callRecords_recordDay) &lt; 22 THEN '20:00-22:00' 
+						WHEN HOUR(info_callRecords_recordDay) &lt; 24 THEN '22:00-24:00' 
+						ELSE 13 END hour,
+					info_callRecords_disposition disposition,
+					info_callRecords_callType callType,
+					COUNT(info_callRecords_id) count,
+					SUM(info_callRecords_billsec) sum
+				FROM info_callRecords 
+				WHERE info_callRecords_group =  #{departmentName} AND  DATE(info_callRecords_recordDay) = #{selectDay}
+				GROUP BY 
+				CASE 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 2 THEN 1 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 4 THEN 2 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 6 THEN 3 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 8 THEN 4 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 10 THEN 5 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 12 THEN 6 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 14 THEN 7 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 16 THEN 8 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 18 THEN 9 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 20 THEN 10 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 22 THEN 11 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 24 THEN 12 
+				ELSE 13 END,
+				CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+				CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END 
+				ORDER BY info_callRecords_recordDay
+			</if>
+			<if test="hour==4">
+				SELECT 
+					CASE 
+						WHEN HOUR(info_callRecords_recordDay) &lt; 4 THEN '00:00-04:00' 
+						WHEN HOUR(info_callRecords_recordDay) &lt; 8 THEN '04:00-08:00' 
+						WHEN HOUR(info_callRecords_recordDay) &lt; 12 THEN '08:00-12:00' 
+						WHEN HOUR(info_callRecords_recordDay) &lt; 16 THEN '12:00-16:00' 
+						WHEN HOUR(info_callRecords_recordDay) &lt; 20 THEN '16:00-20:00' 
+						WHEN HOUR(info_callRecords_recordDay) &lt; 24 THEN '20:00-24:00' 
+						ELSE 13 END hour,
+					info_callRecords_disposition disposition,
+					info_callRecords_callType callType,
+					COUNT(info_callRecords_id) count,
+					SUM(info_callRecords_billsec) sum
+				FROM info_callRecords 
+				WHERE info_callRecords_group =  #{departmentName} AND  DATE(info_callRecords_recordDay) = #{selectDay}
+				GROUP BY 
+				CASE 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 4 THEN 1 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 8 THEN 2 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 12 THEN 3 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 16 THEN 4 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 20 THEN 5 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 24 THEN 6 
+				ELSE 7 END,
+				CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+				CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END 
+				ORDER BY info_callRecords_recordDay
+			</if>
+			<if test="hour==8">
+				SELECT 
+					CASE 
+						WHEN HOUR(info_callRecords_recordDay) &lt; 8 THEN '00:00-08:00' 
+						WHEN HOUR(info_callRecords_recordDay) &lt; 16 THEN '08:00-16:00' 
+						WHEN HOUR(info_callRecords_recordDay) &lt; 24 THEN '16:00-24:00' 
+						ELSE 13 END hour,
+					info_callRecords_disposition disposition,
+					info_callRecords_callType callType,
+					COUNT(info_callRecords_id) count,
+					SUM(info_callRecords_billsec) sum
+				FROM info_callRecords 
+				WHERE info_callRecords_group =  #{departmentName} AND  DATE(info_callRecords_recordDay) = #{selectDay}
+				GROUP BY 
+				CASE 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 8 THEN 1 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 16 THEN 2 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 24 THEN 3 
+				ELSE 4 END,
+				CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+				CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END 
+				ORDER BY info_callRecords_recordDay
+			</if>
+			<if test="hour==12">
+				SELECT 
+					CASE 
+						WHEN HOUR(info_callRecords_recordDay) &lt; 12 THEN '00:00-12:00' 
+						WHEN HOUR(info_callRecords_recordDay) &lt; 24 THEN '12:00-24:00' 
+						ELSE 13 END hour,
+					info_callRecords_disposition disposition,
+					info_callRecords_callType callType,
+					COUNT(info_callRecords_id) count,
+					SUM(info_callRecords_billsec) sum
+				FROM info_callRecords 
+				WHERE info_callRecords_group =  #{departmentName} AND  DATE(info_callRecords_recordDay) = #{selectDay}
+				GROUP BY 
+				CASE 
+				WHEN HOUR(info_callRecords_recordDay) &lt; 12 THEN 1
+				WHEN HOUR(info_callRecords_recordDay) &lt; 24 THEN 2 
+				ELSE 3 END,
+				CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+				CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END 
+				ORDER BY info_callRecords_recordDay
+			</if>
+	</select>
+	
+	<select id="departmentWeekReportData"  resultType="com.dianfeng.entity.back.data.DepartmentData">
+			SELECT 
+				DATE(info_callRecords_recordDay) selectDay,
+				info_callRecords_disposition disposition,
+				info_callRecords_callType callType,
+				COUNT(info_callRecords_id) count,
+				SUM(info_callRecords_billsec) sum 
+			FROM info_callRecords 
+			WHERE info_callRecords_group = #{departmentName} AND  YEAR(info_callRecords_recordDay) = YEAR(#{selectDay}) 
+			AND MONTH(info_callRecords_recordDay) = MONTH(#{selectDay}) AND WEEK(info_callRecords_recordDay) = WEEK(#{selectDay})
+			GROUP BY 
+			date(info_callRecords_recordDay),
+			CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+			CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END 
+			ORDER BY info_callRecords_recordDay
+	</select>
+	
+	<select id="departmentMonthReportData"  resultType="com.dianfeng.entity.back.data.DepartmentData">
+			SELECT 
+				DATE(info_callRecords_recordDay) selectDay,
+				info_callRecords_disposition disposition,
+				info_callRecords_callType callType,
+				COUNT(info_callRecords_id) count,
+				SUM(info_callRecords_billsec) sum 
+			FROM info_callRecords 
+			WHERE info_callRecords_group = #{departmentName} AND  YEAR(info_callRecords_recordDay) = YEAR(#{selectDay}) AND MONTH(info_callRecords_recordDay) = MONTH(#{selectDay})
+			GROUP BY 
+			date(info_callRecords_recordDay),
+			CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+			CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END 
+			ORDER BY info_callRecords_recordDay
+	</select>
+	
+	<select id="departmentHourReportData"  resultType="com.dianfeng.entity.back.data.DepartmentData">
+		<if test="hour==30">
+			SELECT 
+				CASE 
+					WHEN MINUTE(info_callRecords_recordDay) &lt; 30 
+					THEN CONCAT(hour(info_callRecords_recordDay),":00-",hour(info_callRecords_recordDay),":30")
+					ELSE CONCAT(hour(info_callRecords_recordDay),":30-",hour(info_callRecords_recordDay)+1,":00") END hour,
+				info_callRecords_disposition disposition,
+				info_callRecords_callType callType,
+				COUNT(info_callRecords_id) count,
+				SUM(info_callRecords_billsec) sum
+			FROM info_callRecords 
+			WHERE info_callRecords_group = #{departmentName} AND  info_callRecords_recordDay &gt;= #{startDay} AND info_callRecords_recordDay &lt;= #{endDay}
+			GROUP BY 
+			HOUR(info_callRecords_recordDay),
+			CASE WHEN MINUTE(info_callRecords_recordDay) &lt; 30 THEN 1 ELSE 2 END,
+			CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+			CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END 
+			ORDER BY info_callRecords_recordDay
+		</if>
+		<if test="hour==1">
+			SELECT 
+				CONCAT(hour(info_callRecords_recordDay),":00","-",hour(info_callRecords_recordDay)+1,":00") hour,
+				info_callRecords_disposition disposition,
+				info_callRecords_callType callType,
+				COUNT(info_callRecords_id) count,
+				SUM(info_callRecords_billsec) sum
+			FROM info_callRecords 
+			WHERE info_callRecords_group = #{departmentName} AND  info_callRecords_recordDay &gt;= #{startDay} AND info_callRecords_recordDay &lt;= #{endDay}
+			GROUP BY 
+			HOUR(info_callRecords_recordDay),
+			CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+			CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END 
+			ORDER BY info_callRecords_recordDay
+		</if>
+		<if test="hour==2">
+			SELECT 
+				CASE 
+					WHEN HOUR(info_callRecords_recordDay) &lt; 2 THEN '00:00-02:00' 
+					WHEN HOUR(info_callRecords_recordDay) &lt; 4 THEN '02:00-04:00' 
+					WHEN HOUR(info_callRecords_recordDay) &lt; 6 THEN '04:00-06:00' 
+					WHEN HOUR(info_callRecords_recordDay) &lt; 8 THEN '06:00-08:00' 
+					WHEN HOUR(info_callRecords_recordDay) &lt; 10 THEN '08:00-10:00' 
+					WHEN HOUR(info_callRecords_recordDay) &lt; 12 THEN '10:00-12:00' 
+					WHEN HOUR(info_callRecords_recordDay) &lt; 14 THEN '12:00-14:00' 
+					WHEN HOUR(info_callRecords_recordDay) &lt; 16 THEN '14:00-16:00' 
+					WHEN HOUR(info_callRecords_recordDay) &lt; 18 THEN '16:00-18:00' 
+					WHEN HOUR(info_callRecords_recordDay) &lt; 20 THEN '18:00-20:00' 
+					WHEN HOUR(info_callRecords_recordDay) &lt; 22 THEN '20:00-22:00' 
+					WHEN HOUR(info_callRecords_recordDay) &lt; 24 THEN '22:00-24:00' 
+					ELSE 13 END hour,
+				info_callRecords_disposition disposition,
+				info_callRecords_callType callType,
+				COUNT(info_callRecords_id) count,
+				SUM(info_callRecords_billsec) sum
+			FROM info_callRecords 
+			WHERE info_callRecords_group =  #{departmentName} AND  info_callRecords_recordDay &gt;= #{startDay} AND info_callRecords_recordDay &lt;= #{endDay}
+			GROUP BY 
+			CASE 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 2 THEN 1 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 4 THEN 2 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 6 THEN 3 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 8 THEN 4 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 10 THEN 5 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 12 THEN 6 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 14 THEN 7 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 16 THEN 8 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 18 THEN 9 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 20 THEN 10 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 22 THEN 11 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 24 THEN 12 
+			ELSE 13 END,
+			CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+			CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END 
+			ORDER BY info_callRecords_recordDay
+		</if>
+		<if test="hour==4">
+			SELECT 
+				CASE 
+					WHEN HOUR(info_callRecords_recordDay) &lt; 4 THEN '00:00-04:00' 
+					WHEN HOUR(info_callRecords_recordDay) &lt; 8 THEN '04:00-08:00' 
+					WHEN HOUR(info_callRecords_recordDay) &lt; 12 THEN '08:00-12:00' 
+					WHEN HOUR(info_callRecords_recordDay) &lt; 16 THEN '12:00-16:00' 
+					WHEN HOUR(info_callRecords_recordDay) &lt; 20 THEN '16:00-20:00' 
+					WHEN HOUR(info_callRecords_recordDay) &lt; 24 THEN '20:00-24:00' 
+					ELSE 13 END hour,
+				info_callRecords_disposition disposition,
+				info_callRecords_callType callType,
+				COUNT(info_callRecords_id) count,
+				SUM(info_callRecords_billsec) sum
+			FROM info_callRecords 
+			WHERE info_callRecords_group =  #{departmentName} AND  info_callRecords_recordDay &gt;= #{startDay} AND info_callRecords_recordDay &lt;= #{endDay}
+			GROUP BY 
+			CASE 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 4 THEN 1 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 8 THEN 2 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 12 THEN 3 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 16 THEN 4 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 20 THEN 5 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 24 THEN 6 
+			ELSE 7 END,
+			CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+			CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END 
+			ORDER BY info_callRecords_recordDay
+		</if>
+		<if test="hour==8">
+			SELECT 
+				CASE 
+					WHEN HOUR(info_callRecords_recordDay) &lt; 8 THEN '00:00-08:00' 
+					WHEN HOUR(info_callRecords_recordDay) &lt; 16 THEN '08:00-16:00' 
+					WHEN HOUR(info_callRecords_recordDay) &lt; 24 THEN '16:00-24:00' 
+					ELSE 13 END hour,
+				info_callRecords_disposition disposition,
+				info_callRecords_callType callType,
+				COUNT(info_callRecords_id) count,
+				SUM(info_callRecords_billsec) sum
+			FROM info_callRecords 
+			WHERE info_callRecords_group =  #{departmentName} AND  info_callRecords_recordDay &gt;= #{startDay} AND info_callRecords_recordDay &lt;= #{endDay}
+			GROUP BY 
+			CASE 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 8 THEN 1 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 16 THEN 2 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 24 THEN 3 
+			ELSE 4 END,
+			CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+			CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END 
+			ORDER BY info_callRecords_recordDay
+		</if>
+		<if test="hour==12">
+			SELECT 
+				CASE 
+					WHEN HOUR(info_callRecords_recordDay) &lt; 12 THEN '00:00-12:00' 
+					WHEN HOUR(info_callRecords_recordDay) &lt; 24 THEN '12:00-24:00' 
+					ELSE 13 END hour,
+				info_callRecords_disposition disposition,
+				info_callRecords_callType callType,
+				COUNT(info_callRecords_id) count,
+				SUM(info_callRecords_billsec) sum
+			FROM info_callRecords 
+			WHERE info_callRecords_group =  #{departmentName} AND  info_callRecords_recordDay &gt;= #{startDay} AND info_callRecords_recordDay &lt;= #{endDay}
+			GROUP BY 
+			CASE 
+			WHEN HOUR(info_callRecords_recordDay) &lt; 12 THEN 1
+			WHEN HOUR(info_callRecords_recordDay) &lt; 24 THEN 2 
+			ELSE 3 END,
+			CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+			CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END
+			ORDER BY info_callRecords_recordDay
+		</if>
+	</select>
+	
+	
+	
+	
+	<!-- 第四层 -->
+	<select id="trafficDayReportData"  resultType="com.dianfeng.entity.back.data.TrafficData">
+			SELECT 
+				info_callRecords_group departmentName,
+				info_callRecords_disposition disposition,
+				info_callRecords_callType callType,
+				COUNT(info_callRecords_id) count,
+				SUM(info_callRecords_billsec) sum ,
+				MAX(info_callRecords_holdtime) maxHoldTime
+			FROM info_callRecords 
+			WHERE DATE(info_callRecords_recordDay) = #{selectDay}
+			GROUP BY 
+			info_callRecords_group,
+			CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+			CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END
+	</select>
+	<select id="trafficWeekReportData"  resultType="com.dianfeng.entity.back.data.TrafficData">
+			SELECT 
+				info_callRecords_group departmentName,
+				info_callRecords_disposition disposition,
+				info_callRecords_callType callType,
+				COUNT(info_callRecords_id) count,
+				SUM(info_callRecords_billsec) sum ,
+				MAX(info_callRecords_holdtime) maxHoldTime
+			FROM info_callRecords 
+			WHERE 
+				YEAR(info_callRecords_recordDay) = YEAR(#{selectDay}) AND
+				MONTH(info_callRecords_recordDay) = MONTH(#{selectDay}) AND
+				WEEK(info_callRecords_recordDay) = WEEK(#{selectDay})
+			GROUP BY 
+			info_callRecords_group,
+			CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+			CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END
+	</select>
+	<select id="trafficMonthReportData"  resultType="com.dianfeng.entity.back.data.TrafficData">
+			SELECT 
+				info_callRecords_group departmentName,
+				info_callRecords_disposition disposition,
+				info_callRecords_callType callType,
+				COUNT(info_callRecords_id) count,
+				SUM(info_callRecords_billsec) sum ,
+				MAX(info_callRecords_holdtime) maxHoldTime
+			FROM info_callRecords 
+			WHERE 
+				YEAR(info_callRecords_recordDay) = YEAR(#{selectDay}) AND
+				MONTH(info_callRecords_recordDay) = MONTH(#{selectDay})
+			GROUP BY 
+			info_callRecords_group,
+			CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+			CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END
+	</select>	
+
+	<!-- 第五层 -->
+	<select id="departmentSeatDayReportData"  resultType="com.dianfeng.entity.back.data.DepartmentSeatData">
+			SELECT 
+				info_callRecords_agent seatName,
+				info_callRecords_disposition disposition,
+				info_callRecords_callType callType,
+				COUNT(info_callRecords_id) count,
+				SUM(info_callRecords_billsec) sum 
+			FROM info_callRecords 
+			WHERE info_callRecords_group = #{departmentName} AND DATE(info_callRecords_recordDay) = #{selectDay}
+			GROUP BY 
+			info_callRecords_account,
+			CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+			CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END
+	</select>
+	<select id="departmentSeatWeekReportData"  resultType="com.dianfeng.entity.back.data.DepartmentSeatData">
+			SELECT 
+				info_callRecords_agent seatName,
+				info_callRecords_disposition disposition,
+				info_callRecords_callType callType,
+				COUNT(info_callRecords_id) count,
+				SUM(info_callRecords_billsec) sum 
+			FROM info_callRecords 
+			WHERE info_callRecords_group = #{departmentName} AND
+				YEAR(info_callRecords_recordDay) = YEAR(#{selectDay}) AND
+				MONTH(info_callRecords_recordDay) = MONTH(#{selectDay}) AND
+				WEEK(info_callRecords_recordDay) = WEEK(#{selectDay})
+			GROUP BY 
+			info_callRecords_account,
+			CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+			CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END
+	</select>
+	<select id="departmentSeatMonthReportData"  resultType="com.dianfeng.entity.back.data.DepartmentSeatData">
+			SELECT 
+				info_callRecords_agent seatName,
+				info_callRecords_disposition disposition,
+				info_callRecords_callType callType,
+				COUNT(info_callRecords_id) count,
+				SUM(info_callRecords_billsec) sum 
+			FROM info_callRecords 
+			WHERE info_callRecords_group = #{departmentName} AND
+				YEAR(info_callRecords_recordDay) = YEAR(#{selectDay}) AND
+				MONTH(info_callRecords_recordDay) = MONTH(#{selectDay})
+			GROUP BY 
+			info_callRecords_account,
+			CASE WHEN info_callRecords_disposition = 'ANSWERED' THEN 1 ELSE 2 END,
+			CASE WHEN info_callRecords_callType = 'in' THEN 1 WHEN info_callRecords_callType = 'out' THEN 2 ELSE 3 END
+	</select>	
+	
+</mapper>

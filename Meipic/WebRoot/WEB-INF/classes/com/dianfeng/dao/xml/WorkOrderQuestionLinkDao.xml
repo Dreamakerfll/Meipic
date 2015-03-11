@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	<mapper namespace="com.dianfeng.dao.WorkOrderQuestionLinkDao">
+	
+	<select id="getQuestionByWorkOrderId" parameterType="String" resultMap="questionInfoMap">
+		SELECT * FROM work_order_question_link LEFT OUTER JOIN question_info ON work_order_question_link.question_id = question_info.question_id WHERE work_order_question_link.work_order_id = #{workOrderId}
+	</select>
+	
+	<insert id="insertWorkOrderQuestionLink" parameterType="java.util.List">
+		insert into work_order_question_link(
+		work_order_id,
+		question_id) values
+		<foreach collection="workOrderQuestionLinkList" item="item"  separator="," index="index">  
+        (#{item.workOrderId},
+        #{item.questionId})
+        </foreach>
+	</insert>
+	
+	<delete id="deleteWorkOrderQuestionLink" parameterType="java.util.List">  
+	    DELETE FROM work_order_question_link WHERE 
+	   	<foreach collection="workOrderQuestionLinkList" separator="or" item="item" index="index">
+             (work_order_id =#{item.workOrderId} and question_id=#{item.questionId})
+         </foreach>
+	</delete>
+	
+	<delete id="deleteWorkOrderQuestionLinkByWorkOrderId" parameterType="String">
+		DELETE FROM work_order_question_link WHERE work_order_id = #{workOrderId}
+	</delete>
+	
+	
+	<resultMap type="com.dianfeng.entity.QuestionInfo" id="questionInfoMap">
+	<result column="question_id" property="id"/>
+	<result column="question_mold" property="mold"/>
+	<result column="question_type" property="type"/>
+	<result column="question_describe" property="describe"/>
+	<result column="question_phone_imei" property="phoneImei"/>
+	<result column="question_phone_model" property="phoneModel"/>
+	<result column="question_phone_version" property="phoneVersion"/>
+	<result column="question_status" property="status"/>
+	</resultMap>
+	
+	</mapper>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	<mapper namespace="com.dianfeng.dao.AnnouncementDao">
+	
+	<select id="selectAllAnnouncement" resultType="com.dianfeng.entity.Announcement">
+		SELECT 
+			announcement_id AS id,
+			announcement_title AS title,
+			announcement_content AS content,
+			announcement_promulgator AS promulgator,
+			announcement_release_date AS releaseDate,
+			announcement_due_date AS dueDate
+		FROM announcement_info 
+		GROUP BY announcement_release_date DESC;
+	</select>
+	
+	<select id="selectAnnouncementById" resultType="com.dianfeng.entity.Announcement">
+		SELECT 
+			announcement_id AS id,
+			announcement_title AS title,
+			announcement_content AS content,
+			announcement_promulgator AS promulgator,
+			announcement_release_date AS releaseDate,
+			announcement_due_date AS dueDate
+		FROM announcement_info
+		WHERE announcement_id = #{announcementId} 
+		GROUP BY announcement_release_date DESC;
+	</select>
+	
+	<delete id="deleteAnnouncement" parameterType="String">
+		DELETE FROM announcement_info WHERE announcement_id = #{announcementId}
+	</delete>
+	<delete id="deleteNotice" parameterType="String">
+		DELETE FROM login_notice_info where login_notice_noticeid=#{announcementId}
+	</delete>
+	
+	<insert id="addAnnouncement" parameterType="com.dianfeng.entity.Announcement">
+		INSERT INTO announcement_info(
+			announcement_title,
+			announcement_content,
+			announcement_promulgator,
+			announcement_release_date,
+			announcement_due_date
+		)VALUES(
+			#{title},
+			#{content},
+			#{promulgator},
+			#{releaseDate},
+			#{dueDate}
+		)
+	</insert>
+</mapper>
