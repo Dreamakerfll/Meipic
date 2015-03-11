@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	<mapper namespace="com.dianfeng.dao.CustomerPhoneLinkDao">
+	<!--
+	
+	<select id="getCustomerPhoneLinkByCustomerId" parameterType="String" resultMap="customerPhoneLinkMap">
+		select * from customer_phone_link where customer_id = #{customerId}
+	</select>
+	
+	-->
+	<select id="getCustomerPhoneLinkDetailInfoByCondition" parameterType="com.dianfeng.entity.CustomerPhoneLinkDetailInfo" resultMap="customerPhoneLinkDetailInfoMap">
+				SELECT * FROM customer_info
+		LEFT OUTER JOIN customer_phone_link ON customer_info.customer_id = customer_phone_link.customer_id 
+		LEFT OUTER JOIN phone_info ON customer_phone_link.phone_id = phone_info.phone_id WHERE customer_info.customer_id IN
+		(
+		SELECT customer_id_table.customer_id FROM 
+		(SELECT 
+		DISTINCT(customer_info_table.customer_id)
+		 FROM (SELECT customer_id
+		 FROM customer_info WHERE 1=1 
+		 
+		 <if test="name !=null and name !=''">
+			AND customer_name LIKE CONCAT(CONCAT('%', #{name}),'%')
+		</if>
+		<if test="sex !=null and sex !=''">
+			AND customer_sex LIKE CONCAT(CONCAT('%', #{sex}),'%')
+		</if>
+		<if test="age !=null and age !=''">
+			AND customer_age LIKE CONCAT(CONCAT('%', #{age}),'%')
+		</if>
+		<if test="area !=null and area !=''">
+			AND customer_area LIKE CONCAT(CONCAT('%', #{area}),'%')
+		</if>
+		<if test="qq !=null and qq !=''">
+			AND customer_qq LIKE CONCAT(CONCAT('%', #{qq}),'%')
+		</if>
+		<if test="tel !=null and tel !=''">
+			AND customer_tel LIKE CONCAT(CONCAT('%', #{tel}),'%')
+		</if>
+		<if test="address !=null and address !=''">
+			AND customer_address LIKE CONCAT(CONCAT('%', #{address}),'%')
+		</if>
+		<if test="postalCode !=null and postalCode !=''">
+			AND customer_postal_code LIKE CONCAT(CONCAT('%', #{postalCode}),'%')
+		</if>
+		<if test="wechat !=null and wechat !=''">
+			AND customer_wechat LIKE CONCAT(CONCAT('%', #{wechat}),'%')
+		</if>
+		<if test="weibo !=null and weibo !=''">
+			AND customer_weibo LIKE CONCAT(CONCAT('%', #{weibo}),'%')
+		</if>
+		<if test="nickname !=null and nickname !=''">
+			AND customer_nickname LIKE CONCAT(CONCAT('%', #{nickname}),'%')
+		</if>
+		<if test="taobao !=null and taobao !=''">
+			AND customer_taobao LIKE CONCAT(CONCAT('%', #{taobao}),'%')
+		</if>
+		<if test="email !=null and email !=''">
+			AND customer_email LIKE CONCAT(CONCAT('%', #{email}),'%')
+		</if>
+		<if test="jd !=null and jd !=''">
+			AND customer_jd LIKE CONCAT(CONCAT('%', #{jd}),'%')
+		</if>
+		<if test="type !=null and type !=''">
+			AND customer_type LIKE CONCAT(CONCAT('%', #{type}),'%')
+		</if>
+		<if test="agent !=null and agent !=''">
+			AND customer_agent LIKE CONCAT(CONCAT('%', #{agent}),'%')
+		</if>
+		<if test="detail !=null and detail !=''">
+			AND customer_detail LIKE CONCAT(CONCAT('%', #{detail}),'%')
+		</if>
+		
+		 ORDER BY customer_id DESC) AS customer_info_table
+		LEFT OUTER JOIN customer_phone_link ON customer_info_table.customer_id = customer_phone_link.customer_id 
+		LEFT OUTER JOIN phone_info ON customer_phone_link.phone_id = phone_info.phone_id WHERE 1=1 
+		<if test="phoneId !=null and phoneId !=''">
+			AND phone_id LIKE CONCAT(CONCAT('%', #{phoneId}),'%')
+		</if>
+		<if test="imei !=null and imei !=''">
+			AND phone_imei LIKE CONCAT(CONCAT('%', #{imei}),'%')
+		</if>
+		<if test="model !=null and model !=''">
+			AND phone_model LIKE CONCAT(CONCAT('%', #{model}),'%')
+		</if>
+		<if test="version !=null and version !=''">
+			AND phone_version LIKE CONCAT(CONCAT('%', #{version}),'%')
+		</if>
+		<if test="buyTime !=null and buyTime !=''">
+			AND phone_buy_time LIKE CONCAT(CONCAT('%', #{buyTime}),'%')
+		</if>
+		
+		LIMIT #{page},#{rows}) AS customer_id_table)  ORDER BY customer_info.customer_id desc
+		
+	</select>
+	
+	<select id="getCustomerPhoneLinkDetailInfoByConditionCount" parameterType="com.dianfeng.entity.CustomerPhoneLinkDetailInfo" resultType="Integer">
+		SELECT COUNT(DISTINCT(customer_info_table.customer_id)) FROM 
+		(SELECT customer_id
+		 FROM customer_info WHERE 1=1 
+		 
+		 <if test="name !=null and name !=''">
+			and customer_name like concat(concat('%', #{name}),'%')
+		</if>
+		<if test="sex !=null and sex !=''">
+			and customer_sex like concat(concat('%', #{sex}),'%')
+		</if>
+		<if test="age !=null and age !=''">
+			and customer_age like concat(concat('%', #{age}),'%')
+		</if>
+		<if test="area !=null and area !=''">
+			and customer_area like concat(concat('%', #{area}),'%')
+		</if>
+		<if test="qq !=null and qq !=''">
+			and customer_qq like concat(concat('%', #{qq}),'%')
+		</if>
+		<if test="tel !=null and tel !=''">
+			and customer_tel like concat(concat('%', #{tel}),'%')
+		</if>
+		<if test="address !=null and address !=''">
+			and customer_address like concat(concat('%', #{address}),'%')
+		</if>
+		<if test="postalCode !=null and postalCode !=''">
+			and customer_postal_code like concat(concat('%', #{postalCode}),'%')
+		</if>
+		<if test="wechat !=null and wechat !=''">
+			and customer_wechat like concat(concat('%', #{wechat}),'%')
+		</if>
+		<if test="weibo !=null and weibo !=''">
+			and customer_weibo like concat(concat('%', #{weibo}),'%')
+		</if>
+		<if test="nickname !=null and nickname !=''">
+			and customer_nickname like concat(concat('%', #{nickname}),'%')
+		</if>
+		<if test="taobao !=null and taobao !=''">
+			and customer_taobao like concat(concat('%', #{taobao}),'%')
+		</if>
+		<if test="email !=null and email !=''">
+			and customer_email like concat(concat('%', #{email}),'%')
+		</if>
+		<if test="jd !=null and jd !=''">
+			and customer_jd like concat(concat('%', #{jd}),'%')
+		</if>
+		<if test="type !=null and type !=''">
+			and customer_type like concat(concat('%', #{type}),'%')
+		</if>
+		<if test="agent !=null and agent !=''">
+			and customer_agent like concat(concat('%', #{agent}),'%')
+		</if>
+		<if test="detail !=null and detail !=''">
+			and customer_detail like concat(concat('%', #{detail}),'%')
+		</if>
+		
+		 ) AS customer_info_table
+		LEFT OUTER JOIN customer_phone_link ON customer_info_table.customer_id = customer_phone_link.customer_id 
+		LEFT OUTER JOIN phone_info ON customer_phone_link.phone_id = phone_info.phone_id WHERE 1=1 
+		
+		<if test="phoneId !=null and phoneId !=''">
+			and phone_id like concat(concat('%', #{phoneId}),'%')
+		</if>
+		<if test="imei !=null and imei !=''">
+			and phone_imei like concat(concat('%', #{imei}),'%')
+		</if>
+		<if test="model !=null and model !=''">
+			and phone_model like concat(concat('%', #{model}),'%')
+		</if>
+		<if test="version !=null and version !=''">
+			and phone_version like concat(concat('%', #{version}),'%')
+		</if>
+		<if test="buyTime !=null and buyTime !=''">
+			and phone_buy_time like concat(concat('%', #{buyTime}),'%')
+		</if>
+		
+	</select>
+	
+	<insert id="insertCustomerPhoneLink" parameterType="java.util.List">
+		insert into customer_phone_link(
+		customer_id,
+		phone_id) values
+		<foreach collection="customerPhoneLinkList" item="item"  separator="," index="index">  
+        (#{item.customerId},
+        #{item.phoneId})
+        </foreach>
+	</insert>
+	
+	<delete id="deleteCustomerPhoneLink" parameterType="java.util.List">  
+	    DELETE FROM customer_phone_link WHERE 
+	   	<foreach collection="customerPhoneLinkList" separator="or" item="item" index="index">
+             (customer_id =#{item.customerId} and phone_id=#{item.phoneId})
+         </foreach>
+	</delete>
+	
+	<delete id="deleteCustomerPhoneLinkByCustomerId" parameterType="String">
+		delete from customer_phone_link where customer_id = #{customerId}
+	</delete>
+	<!--
+	 
+	<resultMap type="com.dianfeng.entity.CustomerPhoneLink" id="customerPhoneLinkMap">
+	<result column="customer_phone_id" property="id"/>
+	<result column="customer_id" property="customerId"/>
+	<result column="phone_id" property="phoneId"/>
+	</resultMap>
+	
+	-->
+	<resultMap type="com.dianfeng.entity.CustomerPhoneLinkDetailInfo" id="customerPhoneLinkDetailInfoMap">
+	<result column="customer_id" property="customerId"/>
+	<result column="customer_name" property="name"/>
+	<result column="customer_sex" property="sex"/>
+	<result column="customer_age" property="age"/>
+	<result column="customer_area" property="area"/>
+	<result column="customer_qq" property="qq"/>
+	<result column="customer_tel" property="tel"/>
+	<result column="customer_address" property="address"/>
+	<result column="customer_postal_code" property="postalCode"/>
+	<result column="customer_wechat" property="wechat"/>
+	<result column="customer_weibo" property="weibo"/>
+	<result column="customer_nickname" property="nickname"/>
+	<result column="customer_taobao" property="taobao"/>
+	<result column="customer_email" property="email"/>
+	<result column="customer_jd" property="jd"/>
+	<result column="customer_type" property="type"/>
+	<result column="customer_agent" property="agent"/>
+	<result column="customer_detail" property="detail"/>
+	<result column="phone_id" property="phoneId"/>
+	<result column="phone_imei" property="imei"/>
+	<result column="phone_model" property="model"/>
+	<result column="phone_version" property="version"/>
+	<result column="phone_buy_time" property="buyTime"/>
+	</resultMap>
+	
+	</mapper>

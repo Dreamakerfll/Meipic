@@ -1,0 +1,20 @@
+.loading{
+    background:#FF6100;
+    height:3px; 
+    position:fixed;
+    top:0;
+    left:0;
+    z-index:99999;
+}
+.cover{
+	background: #fff;
+	filter: alpha(opacity=100); /* IE的透明度 */
+	opacity: 0.5; /* 透明度 */
+	display: none;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	z-index: 99998; /* 此处的图层要大于页面 */
+}

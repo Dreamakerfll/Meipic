@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	<mapper namespace="com.dianfeng.dao.DepartmentInfoDao">
+	
+	<select id="getAllDepartment" resultMap="departmentInfoMap">
+		select department_id,department_name,department_manager,department_name AS department_name_display,(select count(1) from user_info where user_info.user_department_id = department_id and user_info.user_status='在职') as department_headcount from department_info
+	</select>
+	
+	<insert id="insertDepartmentInfo" parameterType="com.dianfeng.entity.DepartmentInfo">
+		insert into department_info (
+		department_name,
+		department_manager
+		)
+		values(
+		#{name},
+		#{manager}
+		)
+	</insert>
+	
+	<update id="updateDepartmentInfo" parameterType="com.dianfeng.entity.DepartmentInfo">
+		update department_info set 
+		department_name = #{name},
+		department_manager=#{manager}
+		where department_id=#{id}
+	</update>
+	
+	<delete id="deleteDepartmentInfo" parameterType="String">
+		delete from department_info where department_id=#{departmentId}
+	</delete>
+	 
+	<resultMap type="com.dianfeng.entity.DepartmentInfo" id="departmentInfoMap">
+	<result column="department_id" property="id"/>
+	<result column="department_name" property="name"/>
+	<result column="department_name_display" property="nameDisplay"/>
+	<result column="department_headcount" property="headcount"/>
+	<result column="department_manager" property="manager"/>
+	</resultMap>
+	
+	</mapper>

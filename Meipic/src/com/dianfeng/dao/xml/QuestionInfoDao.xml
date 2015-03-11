@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	<mapper namespace="com.dianfeng.dao.QuestionInfoDao">
+	
+	<select id="getMaxQuestionId" resultType="long">
+		SELECT CASE WHEN MAX(question_id) IS NULL THEN 1 ELSE MAX(question_id) END FROM question_info
+	</select>
+	
+	<insert id="insertQuestionInfo" parameterType="java.util.List">
+		insert into question_info(
+		question_id,
+		question_mold,
+		question_type,
+		question_describe,
+		question_phone_imei,
+		question_phone_model,
+		question_phone_version,
+		question_status) values
+		<foreach collection="questionInfoList" item="item"  separator="," index="index">  
+        (#{item.id},
+        #{item.mold},
+        #{item.type},
+        #{item.describe},
+        #{item.phoneImei},
+        #{item.phoneModel},
+        #{item.phoneVersion},
+        #{item.status})
+        </foreach>
+	</insert>
+	
+	<update id="updateQuestionInfo" parameterType="java.util.List">
+		<foreach collection="questionInfoList" item="item" index="index" open="" close="" separator=";">
+			update question_info
+			<set>
+				question_mold = #{item.mold},
+				question_type = #{item.type},
+				question_describe = #{item.describe},
+				question_phone_imei = #{item.phoneImei},
+				question_phone_model = #{item.phoneModel},
+				question_phone_version = #{item.phoneVersion},
+				question_status = #{item.status}
+			</set>
+            where  question_id = #{item.id}
+         </foreach>
+	</update>
+	
+	<delete id="deleteQuestionInfo" parameterType="java.util.List">  
+	    DELETE FROM question_info WHERE question_id IN  
+	    <foreach collection="questionInfoList" index="index" item="item" open="(" separator="," close=")">   
+	        #{item.id}   
+	    </foreach>  
+	</delete>
+	
+	<delete id="deleteQuestionInfoByWorkOrderId" parameterType="String">
+		delete from question_info where question_id in (select question_id from work_order_question_link where work_order_id = #{workOrderId})
+	</delete>
+
+	<resultMap type="com.dianfeng.entity.QuestionInfo" id="questionInfoMap">
+	<result column="question_id" property="id"/>
+	<result column="question_mold" property="mold"/>
+	<result column="question_type" property="type"/>
+	<result column="question_describe" property="describe"/>
+	<result column="question_phone_imei" property="phoneImei"/>
+	<result column="question_phone_model" property="phoneModel"/>
+	<result column="question_phone_version" property="phoneVersion"/>
+	<result column="question_status" property="status"/>
+	</resultMap>
+	
+	</mapper>

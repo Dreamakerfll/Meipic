@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<!-- spring整合mybatis之后，这个配置文件基本可以不要了 -->
+	<!-- 设置类别名 -->
+	<!-- 设置外部配置文件 -->
+	<!-- 设置数据库连接环境 -->
+	<!-- 映射文件 -->
+	 <mappers>
+       <mapper resource="com/dianfeng/dao/xml/PhoneModelDao.xml"/>
+       <mapper resource="com/dianfeng/dao/xml/PhoneVersionDao.xml"/>
+       <mapper resource="com/dianfeng/dao/xml/CustomerInfoDao.xml"/>
+       <mapper resource="com/dianfeng/dao/xml/CustomerTypeDao.xml"/>
+       <mapper resource="com/dianfeng/dao/xml/CustomerPhoneLinkDao.xml"/>
+		<mapper resource="com/dianfeng/dao/xml/PhoneInfoDao.xml"/>
+		<mapper resource="com/dianfeng/dao/xml/CustomerWorkOrderLinkDao.xml"/>
+		<mapper resource="com/dianfeng/dao/xml/UserInfoDao.xml"/>
+       <mapper resource="com/dianfeng/dao/xml/QuestionTypeDao.xml"/>
+       <mapper resource="com/dianfeng/dao/xml/WorkOrderQuestionLinkDao.xml"/>
+       <mapper resource="com/dianfeng/dao/xml/WorkOrderInfoDao.xml"/>
+       <mapper resource="com/dianfeng/dao/xml/QuestionInfoDao.xml"/>
+       <mapper resource="com/dianfeng/dao/xml/AreaInfoDao.xml"/>
+       <mapper resource="com/dianfeng/dao/xml/AgentInfoDao.xml"/>
+       <mapper resource="com/dianfeng/dao/xml/RoleInfoDao.xml"/>
+       <mapper resource="com/dianfeng/dao/xml/DepartmentInfoDao.xml"/>
+       <mapper resource="com/dianfeng/dao/xml/ReturnDataDao.xml"/>
+       <mapper resource="com/dianfeng/dao/xml/ReturnLoginDao.xml"/>
+       <mapper resource="com/dianfeng/dao/xml/AnnouncementDao.xml"/> 
+       <mapper resource="com/dianfeng/dao/xml/KnowledgeBaseDao.xml"/> 
+       <mapper resource="com/dianfeng/dao/xml/MisscallInfoDao.xml"/>
+       <mapper resource="com/dianfeng/dao/xml/BlacklistInfoDao.xml"/>
+       <mapper resource="com/dianfeng/dao/xml/TransferDao.xml"/>
+
+       <mapper resource="com/dianfeng/dao/xml/QueueLogDao.xml"/>
+
+       <mapper resource="com/dianfeng/dao/xml/RecordDao.xml"/>
+       <mapper resource="com/dianfeng/dao/xml/FollowHistoryInfoDao.xml"/>
+
+    </mappers>
+</configuration>

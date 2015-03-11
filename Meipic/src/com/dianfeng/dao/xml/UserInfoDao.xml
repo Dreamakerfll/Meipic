@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	<mapper namespace="com.dianfeng.dao.UserInfoDao">
+	
+	<select id="getAllUser" resultMap="userInfoMap">
+		SELECT DISTINCT(user_agent) AS user_agent_display,user_agent,user_account,user_account AS user_account_display,department_info.department_name as user_department_display FROM user_info LEFT OUTER JOIN department_info ON user_info.user_department_id = department_info.department_id
+	</select>
+	
+	<select id="getAllUserWithPage" resultMap="userInfoMap">
+		select *,user_agent as user_agent_display,user_account as user_account_display,role_info.role_name as user_role_display,department_info.department_name as user_department_display from user_info 
+		LEFT OUTER JOIN department_info ON user_info.user_department_id = department_info.department_id 
+		LEFT OUTER JOIN role_info ON user_info.user_role_id = role_info.role_id
+	</select>
+	
+	<select id="getUserByCondition" parameterType="com.dianfeng.entity.UserInfo" resultMap="userInfoMap">
+		select *,user_agent as user_agent_display,user_account as user_account_display,role_info.role_name as user_role_display,department_info.department_name as user_department_display from user_info left outer join role_info on user_info.user_role_id = role_info.role_id left outer join department_info on user_info.user_department_id = department_info.department_id where 1=1
+		<if test="name !=null and name !=''">
+			and user_name like concat(concat('%', #{name}),'%')
+		</if>
+		<if test="account !=null and account !=''">
+			and user_account like concat(concat('%', #{account}),'%')
+		</if>
+		<if test="agent !=null and agent !=''">
+			and user_agent like concat(concat('%', #{agent}),'%')
+		</if>
+		<if test="roleId !=null and roleId !=''">
+			and user_role_id like concat(concat('%', #{roleId}),'%')
+		</if>
+		<if test="departmentId !=null and departmentId !=''">
+			and user_department_id = #{departmentId}
+		</if>
+		<if test="area !=null and area !=''">
+			and user_area like concat(concat('%', #{area}),'%')
+		</if>
+		<if test="tel !=null and tel !=''">
+			and user_tel like concat(concat('%', #{tel}),'%')
+		</if>
+		<if test="status !=null and status !=''">
+			and user_status like concat(concat('%', #{status}),'%')
+		</if>
+	</select>
+	
+	<select id="checkUserExist" parameterType="String" resultMap="userInfoMap">
+		select * from user_info where user_account = #{account}
+	</select>
+	
+	<select id="getUserByRoleId" parameterType="String" resultMap="userInfoMap">
+		select * from user_info where user_role_id = #{roleId} limit 1 offset 0
+	</select>
+	
+	<select id="getUserByDepartmentId" parameterType="String" resultMap="userInfoMap">
+		select * from user_info where user_department_id = #{departmentId} limit 1 offset 0
+	</select>
+	
+	<insert id="insertUserInfo" parameterType="com.dianfeng.entity.UserInfo">
+		insert into user_info(
+		user_account,
+		user_password,
+		user_name,
+		user_agent,
+		user_queue,
+		user_role_id,
+		user_area,
+		user_department_id,
+		user_tel,
+		user_status) values
+        (#{account},
+        '123456',
+        #{name},
+        #{agent},
+        #{queue},
+        #{roleId},
+        #{area},
+        #{departmentId},
+        #{tel},
+        #{status})
+	</insert>
+	
+	<update id="updateUserInfo" parameterType="com.dianfeng.entity.UserInfo">
+			update user_info set
+				user_name = #{name},
+				user_tel = #{tel},
+				user_agent = #{agent},
+				user_role_id = #{roleId},
+				user_department_id = #{departmentId},
+				user_status = #{status},
+				user_queue = #{queue},
+				user_area = #{area} 
+            where user_id = #{id}
+	</update>
+	
+	<delete id="deleteUserInfo" parameterType="String">  
+	    DELETE FROM user_info WHERE user_id = #{id}
+	</delete>
+	 
+	<resultMap type="com.dianfeng.entity.UserInfo" id="userInfoMap">
+	<result column="user_id" property="id"/>
+	<result column="user_account" property="account"/>
+	<result column="user_account_display" property="accountDisplay"/>
+	<result column="user_password" property="password"/>
+	<result column="user_name" property="name"/>
+	<result column="user_agent" property="agent"/>
+	<result column="user_agent_display" property="agentDisplay"/>
+	<result column="user_queue" property="queue"/>
+	<result column="user_role_id" property="roleId"/>
+	<result column="user_role_display" property="roleDisplay"/>
+	<result column="user_area" property="area"/>
+	<result column="user_department_id" property="departmentId"/>
+	<result column="user_department_display" property="departmentDisplay"/>
+	<result column="user_tel" property="tel"/>
+	<result column="user_status" property="status"/>
+	</resultMap>
+	
+	</mapper>

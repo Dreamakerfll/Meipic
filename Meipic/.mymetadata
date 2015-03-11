@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="Meipic"
+  id="myeclipse.1417596300969"
+  context-root="/Meipic"
+  j2ee-spec="5.0"
+  archive="Meipic.war">
+  <attributes>
+    <attribute name="webrootdir" value="/WebRoot" />
+  </attributes>
+</project-module>
+

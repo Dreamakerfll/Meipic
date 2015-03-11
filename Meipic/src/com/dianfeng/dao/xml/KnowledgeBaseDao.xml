@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dianfeng.dao.KnowledgeBaseDao">
+	<select id="getNods" resultType="com.dianfeng.entity.KnowledgeBase">
+		select * from knowledgebase where parentId = #{parentId}
+	</select>
+	<select id="selectKnowledgeBaseById" resultType="com.dianfeng.entity.KnowledgeBase">
+		select * from knowledgebase where id = #{id} or parentId = #{id}
+	</select>
+	<select id="selectKnowledgeBaseByKeyWordChi" resultType="com.dianfeng.entity.KnowledgeBase">
+		select * from knowledgebase where  keyWordChi like concat(concat('%', #{keyWordChi}),'%')
+	</select>
+	<delete id="delKnowledgebaseById">
+		delete from knowledgebase where id = #{id} or parentId = #{id} 
+	</delete>
+	<select id="findKnowledgeBaseById" resultType="com.dianfeng.entity.KnowledgeBase">
+		select * from knowledgebase where  id = #{id}
+	</select>
+	<update id="updateKnowledgeBase" parameterType="KnowledgeBase">
+		update knowledgebase set 
+		myType=#{myType},
+		parentType=#{parentType},
+		title = #{title},
+		keyWordChi = #{keyWordChi}, 
+		addTime = #{addTime},
+		content = #{content} 
+		where id = #{id}
+	</update>
+	<insert id="addKnowledgeBase" parameterType="KnowledgeBase">
+		insert into knowledgebase(
+			parentId,myType,parentType,
+			title,keyWordChi,addTime, content
+		) 
+		values(
+			#{parentId},
+			#{myType},
+			#{parentType},
+			#{title},
+			#{keyWordChi},
+			#{addTime},
+			#{content}
+		)
+	</insert>
+</mapper>

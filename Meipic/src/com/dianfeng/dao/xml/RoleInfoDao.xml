@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	<mapper namespace="com.dianfeng.dao.RoleInfoDao">
+	
+	<select id="getAllRole" resultMap="roleInfoMap">
+		select *,role_name AS role_name_display from role_info
+	</select>
+	
+	<update id="updateRoleInfo" parameterType="com.dianfeng.entity.RoleInfo">
+		update role_info set 
+		role_name = #{name},
+		role_right_id=#{rightId},
+		role_right_content=#{rightContent} 
+		where role_id=#{id}
+	</update>
+	
+	<insert id="insertRoleInfo" parameterType="com.dianfeng.entity.RoleInfo">
+		insert into role_info (
+		role_name,
+		role_right_id,
+		role_right_content
+		)
+		values(
+		#{name},
+		#{rightId},
+		#{rightContent}
+		)
+	</insert>
+	
+	<delete id="deleteRoleInfo" parameterType="String">
+		delete from role_info where role_id=#{id}
+	</delete>
+	 
+	<resultMap type="com.dianfeng.entity.RoleInfo" id="roleInfoMap">
+	<result column="role_id" property="id"/>
+	<result column="role_name" property="name"/>
+	<result column="role_name_display" property="nameDisplay"/>
+	<result column="role_right_id" property="rightId"/>
+	<result column="role_right_content" property="rightContent"/>
+	</resultMap>
+	
+	</mapper>

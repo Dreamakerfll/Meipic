@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	<mapper namespace="com.dianfeng.dao.AgentInfoDao">
+	
+	<select id="getNoUseAgent" parameterType="String" resultMap="agentInfoMap">
+		SELECT agent_number,agent_number as agent_number_display FROM agent_info WHERE agent_number NOT IN (SELECT user_info.user_agent FROM user_info WHERE user_agent NOT IN(#{agent})) ORDER BY agent_number
+	</select>
+	
+	<select id="getAllAgent" resultMap="userInfoMap">
+		SELECT * from user_info where user_agent != '注销' order by user_agent asc
+	</select>
+	 
+	<resultMap type="com.dianfeng.entity.AgentInfo" id="agentInfoMap">
+	<result column="agent_id" property="id"/>
+	<result column="agent_number" property="number"/>
+	<result column="agent_number_display" property="numberDisplay"/>
+	<result column="agent_status" property="status"/>
+	<result column="agent_deadline" property="deadline"/>
+	</resultMap>
+	
+	<resultMap type="com.dianfeng.entity.UserInfo" id="userInfoMap">
+	<result column="user_id" property="id"/>
+	<result column="user_account" property="account"/>
+	<result column="user_account_display" property="accountDisplay"/>
+	<result column="user_password" property="password"/>
+	<result column="user_name" property="name"/>
+	<result column="user_agent" property="agent"/>
+	<result column="user_queue" property="queue"/>
+	<result column="user_role_id" property="roleId"/>
+	<result column="user_role_display" property="roleDisplay"/>
+	<result column="user_area" property="area"/>
+	<result column="user_department_id" property="departmentId"/>
+	<result column="user_department_display" property="departmentDisplay"/>
+	<result column="user_tel" property="tel"/>
+	<result column="user_status" property="status"/>
+	</resultMap>
+	
+	</mapper>

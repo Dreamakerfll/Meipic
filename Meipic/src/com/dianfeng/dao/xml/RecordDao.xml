@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	<mapper namespace="com.dianfeng.dao.RecordDao">
+	<select id="selectAllRecord" resultType="com.dianfeng.entity.Record">
+		SELECT
+			info_callRecords_id id, 
+			records_type recordType,
+			work_order_assembly_line assemblyLine,
+			Date(info_callRecords_recordDay) recordDay,
+			TIME(info_callRecords_recordDay) startTime,
+			info_callRecords_billsec recordTime,
+			info_callRecords_callType callType,
+			info_callRecords_callers callers,
+			info_callRecords_answers answers,
+			asteriskcdrdb.evaluate.Evaluate score,
+			info_callRecords_recordPath recordPath
+		FROM info_callRecords 
+		LEFT JOIN work_order_record_link
+		ON work_order_record_link.work_order_unique_id = info_callRecords.info_callRecords_uniqueId
+		LEFT JOIN asteriskcdrdb.evaluate
+		on info_callRecords.info_callRecords_uniqueId = asteriskcdrdb.evaluate.UniqueId
+		LEFT JOIN records_type
+		on info_callRecords.info_callRecords_uniqueId = records_type.records_uniqueId
+		WHERE 1=1  
+		<if test="startTime !=null and startTime!=''">
+			AND info_callRecords_recordDay &gt;=#{startTime} 
+		</if>
+		<if test="endTime !=null and endTime!=''">
+			AND info_callRecords_recordDay &lt;= #{endTime}
+		</if>
+		<if test="inPhone !=null and inPhone!=''">
+			AND (info_callRecords_callers like concat(concat('%', #{inPhone}),'%') OR info_callRecords_answers like concat(concat('%', #{inPhone}),'%'))
+		</if>
+		<if test="score !=null and score!=''">
+			AND asteriskcdrdb.evaluate.Evaluate = #{score} 
+		</if>
+		<if test="seatNumber !=null and seatNumber!=''">
+			AND info_callRecords_agent = #{seatNumber}
+		</if>
+		ORDER BY info_callRecords_recordDay DESC;
+	</select>
+	
+	
+	<select id="selectAllRecordSeatNotClick" resultType="com.dianfeng.entity.Record">
+		SELECT
+			info_callRecords_id id, 
+			records_type recordType,
+			work_order_assembly_line assemblyLine,
+			Date(info_callRecords_recordDay) recordDay,
+			TIME(info_callRecords_recordDay) startTime,
+			info_callRecords_billsec recordTime,
+			info_callRecords_callType callType,
+			info_callRecords_callers callers,
+			info_callRecords_answers answers,
+			asteriskcdrdb.evaluate.Evaluate score,
+			info_callRecords_recordPath recordPath
+		FROM info_callRecords 
+		LEFT JOIN work_order_record_link
+		ON work_order_record_link.work_order_unique_id = info_callRecords.info_callRecords_uniqueId
+		LEFT JOIN asteriskcdrdb.evaluate
+		on info_callRecords.info_callRecords_uniqueId = asteriskcdrdb.evaluate.UniqueId
+		LEFT JOIN records_type
+		on info_callRecords.info_callRecords_uniqueId = records_type.records_uniqueId
+		WHERE 1=1   AND  ISNULL(records_type) AND ISNULL(asteriskcdrdb.evaluate.Evaluate)
+		<if test="startTime !=null and startTime!=''">
+			AND info_callRecords_recordDay &gt;=#{startTime} 
+		</if>
+		<if test="endTime !=null and endTime!=''">
+			AND info_callRecords_recordDay &lt;= #{endTime}
+		</if>
+		<if test="inPhone !=null and inPhone!=''">
+			AND (info_callRecords_callers like concat(concat('%', #{inPhone}),'%') OR info_callRecords_answers like concat(concat('%', #{inPhone}),'%'))
+		</if>
+		<if test="seatNumber !=null and seatNumber!=''">
+			AND info_callRecords_agent = #{seatNumber}
+		</if>
+		ORDER BY info_callRecords_recordDay DESC;
+	</select>
+	
+	<select id="selectAllRecordUserNotClick" resultType="com.dianfeng.entity.Record">
+		SELECT
+			info_callRecords_id id, 
+			records_type recordType,
+			work_order_assembly_line assemblyLine,
+			Date(info_callRecords_recordDay) recordDay,
+			TIME(info_callRecords_recordDay) startTime,
+			info_callRecords_billsec recordTime,
+			info_callRecords_callType callType,
+			info_callRecords_callers callers,
+			info_callRecords_answers answers,
+			asteriskcdrdb.evaluate.Evaluate score,
+			info_callRecords_recordPath recordPath
+		FROM info_callRecords 
+		LEFT JOIN work_order_record_link
+		ON work_order_record_link.work_order_unique_id = info_callRecords.info_callRecords_uniqueId
+		LEFT JOIN asteriskcdrdb.evaluate
+		on info_callRecords.info_callRecords_uniqueId = asteriskcdrdb.evaluate.UniqueId
+		LEFT JOIN records_type
+		on info_callRecords.info_callRecords_uniqueId = records_type.records_uniqueId
+		WHERE 1=1   AND  !isNULL(records_type) AND ISNULL(asteriskcdrdb.evaluate.Evaluate)
+		<if test="startTime !=null and startTime!=''">
+			AND info_callRecords_recordDay &gt;=#{startTime} 
+		</if>
+		<if test="endTime !=null and endTime!=''">
+			AND info_callRecords_recordDay &lt;= #{endTime}
+		</if>
+		<if test="inPhone !=null and inPhone!=''">
+			AND (info_callRecords_callers like concat(concat('%', #{inPhone}),'%') OR info_callRecords_answers like concat(concat('%', #{inPhone}),'%'))
+		</if>
+		<if test="seatNumber !=null and seatNumber!=''">
+			AND info_callRecords_agent = #{seatNumber}
+		</if>
+		ORDER BY info_callRecords_recordDay DESC;
+	</select>
+	
+	<select id="getRecordByUniqueId" parameterType = "String" resultMap="workOrderRecordLinkMap">
+		select * from work_order_record_link where work_order_unique_id = #{uniqueId} and work_order_assembly_line =#{assemblyLine}
+	</select>
+	
+	<select id="getRecordByRecordId" parameterType = "String" resultMap="recordMap">
+		select info_callRecords_id,info_callRecords_uniqueId from info_callRecords where info_callRecords_id = #{recordId}
+	</select>
+	
+	<insert id="insertWordOrderRecordLink" parameterType = "String">
+		insert into work_order_record_link (
+		work_order_assembly_line,
+		work_order_unique_id) values
+		(#{assemblyLine},
+		#{uniqueId})
+		
+	</insert>
+	
+	<resultMap type="com.dianfeng.entity.WorkOrderRecordLink" id="workOrderRecordLinkMap">
+	<result column="work_order_record_id" property="id"/>
+	<result column="work_order_assembly_line" property="assemblyLine"/>
+	<result column="work_order_unique_id" property="uniqueId"/>
+	</resultMap>
+	
+	<resultMap type="com.dianfeng.entity.Record" id="recordMap">
+	<result column="info_callRecords_id" property="id"/>
+	<result column="info_callRecords_uniqueId" property="uniqueId"/>
+	</resultMap>
+</mapper>

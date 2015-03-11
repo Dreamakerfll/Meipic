@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	<mapper namespace="com.dianfeng.dao.CustomerInfoDao">
+	
+	<select id="getCustomerInfoByTel" parameterType="String" resultMap="customerInfoMap">
+		select * from customer_info where customer_tel like concat(concat('%', #{tel}),'%') limit 1 offset 0
+	</select>
+	
+	<insert id="insertCustomerInfo" parameterType="com.dianfeng.entity.CustomerInfo" useGeneratedKeys="true" keyProperty="id">
+		insert into customer_info (
+		customer_name,
+		customer_sex,
+		customer_age,
+		customer_area,
+		customer_qq,
+		customer_tel,
+		customer_address,
+		customer_postal_code,
+		customer_wechat,
+		customer_weibo,
+		customer_nickname,
+		customer_taobao,
+		customer_email,
+		customer_jd,
+		customer_type,
+		customer_agent,
+		customer_detail) 
+		values(
+		#{name},
+		#{sex},
+		#{age},
+		#{area},
+		#{qq},
+		#{tel},
+		#{address},
+		#{postalCode},
+		#{wechat},
+		#{weibo},
+		#{nickname},
+		#{taobao},
+		#{email},
+		#{jd},
+		#{type},
+		#{agent},
+		#{detail})
+	</insert>
+	
+	<update id="updateCustomerInfo" parameterType="com.dianfeng.entity.CustomerInfo">
+		update customer_info set 
+		customer_name = #{name},
+		customer_sex = #{sex},
+		customer_age = #{age},
+		customer_area = #{area},
+		customer_qq = #{qq},
+		customer_tel = #{tel},
+		customer_address = #{address},
+		customer_postal_code = #{postalCode},
+		customer_wechat = #{wechat},
+		customer_weibo = #{weibo},
+		customer_nickname = #{nickname},
+		customer_taobao = #{taobao},
+		customer_email = #{email},
+		customer_jd = #{jd},
+		customer_type = #{type},
+		customer_agent = #{agent},
+		customer_detail = #{detail}
+		where customer_id = #{id}
+	</update>
+	
+	<delete id="deleteCustomerInfo" parameterType="String">
+		delete from customer_info where customer_id = #{customerId}
+	</delete>
+	 
+	<resultMap type="com.dianfeng.entity.CustomerInfo" id="customerInfoMap">
+	<result column="customer_id" property="id"/>
+	<result column="customer_name" property="name"/>
+	<result column="customer_sex" property="sex"/>
+	<result column="customer_age" property="age"/>
+	<result column="customer_area" property="area"/>
+	<result column="customer_qq" property="qq"/>
+	<result column="customer_tel" property="tel"/>
+	<result column="customer_address" property="address"/>
+	<result column="customer_postal_code" property="postalCode"/>
+	<result column="customer_wechat" property="wechat"/>
+	<result column="customer_weibo" property="weibo"/>
+	<result column="customer_nickname" property="nickname"/>
+	<result column="customer_taobao" property="taobao"/>
+	<result column="customer_email" property="email"/>
+	<result column="customer_jd" property="jd"/>
+	<result column="customer_type" property="type"/>
+	<result column="customer_agent" property="agent"/>
+	<result column="customer_detail" property="detail"/>
+	</resultMap>
+	
+	</mapper>

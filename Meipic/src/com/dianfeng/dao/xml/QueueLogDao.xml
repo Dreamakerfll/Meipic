@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	<mapper namespace="com.dianfeng.dao.QueueLogDao">
+	
+	<update id="updateQueueLog" parameterType="com.dianfeng.entity.QueueLog" >
+		update asterisk.queue_log set agent=#{agent}
+		where callid=#{callid} and event=#{event}
+	</update>
+	
+	</mapper>

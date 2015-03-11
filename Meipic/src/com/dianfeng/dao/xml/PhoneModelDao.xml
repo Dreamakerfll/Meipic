@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	<mapper namespace="com.dianfeng.dao.PhoneModelDao">
+	
+	<select id="getAllPhoneModel" resultMap="PhoneModelMap">
+		select *,phone_model as phone_model_display from phone_model
+	</select>
+	 
+	<resultMap type="com.dianfeng.entity.PhoneModel" id="PhoneModelMap">
+	<result column="phone_model_id" property="id"/>
+	<result column="phone_model" property="phoneModel"/>
+	<result column="phone_model_display" property="phoneModelDisplay"/>
+	</resultMap>
+	
+	</mapper>

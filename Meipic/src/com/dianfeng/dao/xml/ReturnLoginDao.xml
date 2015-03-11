@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	<mapper namespace="com.dianfeng.dao.ReturnLoginDao">
+		<select id="selectNameOrPwd" resultType="Integer">
+			select count(*) from user_info where user_account = #{number} and user_password = #{password}
+		</select>
+		
+		<select id="getSeatByLoginName" resultType="com.dianfeng.entity.ReturnSeat">
+			select 
+			user_account as number,
+			user_name as name,
+			i.role_right_id AS jurisdictions,
+			user_agent as agentNumber,
+			user_queue as queue,
+			user_role_id as role,
+			user_area as regionals from user_info as u LEFT JOIN role_info as i on u.user_role_id = i.role_id 
+			where user_account=#{number}
+
+		</select>
+		
+		<select id="findAgentNumberByQueue" resultType="com.dianfeng.entity.SimpleSeat">
+		SELECT user_agent AS agentNumber,user_account AS account,0 AS status
+		FROM user_info
+		WHERE user_queue like  concat(concat('%', #{queueStr}),'%')
+		ORDER BY user_agent;
+	</select>
+	
+	<insert id="seatLogin" parameterType="com.dianfeng.entity.LoginRecordInfo">
+		insert into login_record_info(login_record_login_time,login_record_agent,login_record_account)
+		values(#{loginTime},#{agent},#{account})
+	</insert>
+	
+	<update id="updateOldQueueAction" parameterType="String">
+		update queue_old_info  set queue_old_queue = #{queueStr} WHERE queue_old_agent = #{agentNumber};
+	</update>
+	
+	<insert id="insertOldQueueAction" parameterType="String">
+		insert into queue_old_info(queue_old_queue,queue_old_agent)
+		values(#{queueStr},#{agentNumber})
+	</insert>
+	
+	<insert id="insertAction" parameterType="com.dianfeng.entity.ActionRecordInfo">
+		insert into action_record_info(action_record_status,action_record_begin_time,action_record_account,action_record_agent)
+		values(#{status},#{beginTime},#{account},#{agent})
+	</insert>
+	<update id="seatLogout" parameterType="String">
+		UPDATE login_record_info 
+		SET login_record_logout_time = #{outTime}
+		WHERE login_record_account=#{account}  AND  login_record_agent = #{agentNumber}
+		AND (login_record_logout_time = '' OR ISNULL(login_record_logout_time))
+		AND login_record_id = 
+		(
+			SELECT a.id FROM 
+			(
+				SELECT MAX(login_record_id) AS id FROM login_record_info  AS a 
+				WHERE login_record_account=#{account}  AND  login_record_agent = #{agentNumber} 
+				AND (login_record_logout_time = '' OR ISNULL(login_record_logout_time))
+			)a
+		);
+	</update>
+	
+	<update id="updateAction" parameterType="String">
+		UPDATE action_record_info
+		SET action_record_end_time = #{endTime},action_record_interval_time = (UNIX_TIMESTAMP(action_record_end_time)-UNIX_TIMESTAMP(action_record_begin_time))
+		WHERE action_record_account =#{account}  AND  action_record_agent = #{agentNumber} AND action_record_status = #{status}
+		AND (action_record_end_time = '' OR ISNULL(action_record_end_time))
+		AND action_record_id = 
+		(
+			SELECT a.id FROM 
+			(
+				SELECT MAX(action_record_id) AS id FROM action_record_info  AS a 
+				WHERE action_record_account=#{account}  AND  action_record_agent = #{agentNumber} AND action_record_status = #{status}
+				AND (action_record_end_time = '' OR ISNULL(action_record_end_time))
+			)a
+		);
+	</update>
+	
+	<select id="selectPwd" resultType="Integer">
+		select user_password=#{oldPwd} from user_info where user_account=#{loginName}
+	</select>
+	
+	<update id="updateNewPwd" parameterType="Integer">
+		UPDATE user_info set user_password=#{newPwd} where user_account =#{loginName}
+	</update>
+	
+	<select id="findCallLossByAgentNumber" resultType="com.dianfeng.entity.ReturnCallLoss">
+		SELECT 
+			info_callRecords_callers AS callNumber,
+			info_callRecords_recordDay AS callTime,
+			info_callRecords_id AS id 
+		FROM info_callRecords 
+		WHERE 
+		info_callRecords_callType = 'in' 
+		AND info_callRecords_disposition = 'NO ANSWER' 
+		AND info_is_display = '0'
+		AND info_callRecords_operator = #{agentNumber};
+	</select>
+	
+	<delete id="deleteCallLossById">
+		UPDATE info_callRecords SET info_is_display = '1' WHERE info_callRecords_id = #{callLossId}
+	</delete>
+	
+	<select id="selectCallOutByAgentNumber" resultType="Integer">
+		select COUNT(*) from  info_callRecords where info_callRecords_agent = #{agentNumber} 
+		and info_callRecords_disposition ='ANSWERED'
+		and info_callRecords_callType = 'in'
+		and info_callRecords_recordDay like concat(concat('%', #{time}),'%')
+	</select>
+	
+	<select id="selectCallTimeByAgentNumber" resultType="Integer">
+		select sum(info_callRecords_billsec) from info_callRecords where
+ 		info_callRecords_agent=#{agentNumber} and info_callRecords_recordDay like concat(concat('%', #{time}),'%')
+	</select>
+	<insert id="addNotice" parameterType="String">
+		insert into login_notice_info (login_notice_noticeid,login_notice_title,login_notice_due_date,login_notice_agent,login_notice_status)values(#{noticeId},#{title},#{time},#{agentNumber},#{status})
+	</insert>
+	<select id="selectAllNoticeByAgent" resultType="com.dianfeng.entity.Notice">
+		select login_notice_id as id,
+			   login_notice_agent as agent,
+			   login_notice_title as title,
+			   login_notice_noticeid as noticeid,
+			   login_notice_status as status from login_notice_info where login_notice_agent=#{agentNumber}
+	</select>
+	<select id="selectAllNoticeByAgentByStatus" resultType="com.dianfeng.entity.Notice">
+		select login_notice_id as id,
+			   login_notice_agent as agent,
+			   login_notice_title as title,
+			   login_notice_noticeid as noticeid,
+			   login_notice_status as status from login_notice_info
+			    where login_notice_agent=#{agentNumber} 
+			    and login_notice_status='0' and login_notice_due_date &gt;=#{time}
+	</select>
+	
+	<select id="selectAllAnnouncement" resultType="com.dianfeng.entity.Announcement">
+		SELECT 
+			announcement_id AS id,
+			announcement_title AS title,
+			announcement_content AS content,
+			announcement_promulgator AS promulgator,
+			announcement_release_date AS releaseDate,
+			announcement_due_date AS dueDate
+		FROM announcement_info where announcement_due_date &gt;=#{time}
+	</select>
+	
+	<select id="findAllOnLineSeat" resultType="com.dianfeng.entity.ReturnOnLineSeat">
+		SELECT 
+			action_record_begin_time AS startTime,
+			action_record_agent AS agentNumber,
+			action_record_account AS account,
+			action_record_end_time,
+			action_record_status
+		FROM action_record_info WHERE  action_record_begin_time in 
+		(
+			SELECT 
+					max(action_record_begin_time) AS startTime
+			FROM action_record_info 
+			GROUP BY action_record_agent
+		)
+		HAVING (ISNULL(action_record_end_time) OR action_record_end_time ='') AND action_record_status in (1,2) AND action_record_agent != '注销'
+	</select>
+	
+	<select id="selectAnnouncementById" resultType="com.dianfeng.entity.Announcement">
+		SELECT 
+			announcement_title AS title,
+			announcement_content AS content,
+			announcement_promulgator AS promulgator,
+			announcement_release_date AS releaseDate,
+			announcement_due_date AS dueDate
+		FROM announcement_info a join login_notice_info l on announcement_id = login_notice_noticeid where login_notice_id=#{id}
+	</select>
+	
+	<update id="updateNotice" parameterType="Integer">
+		update login_notice_info set login_notice_status='1' where login_notice_id=#{id}
+	</update>
+	
+	<select id="selectCallTimeByUniqueId" resultType="Integer">
+		select billsec from asteriskcdrdb.cdr where uniqueid = #{uniqueId}
+	</select>
+	
+	<insert id="addUniqueId" parameterType="Integer">
+		insert into records_type(records_uniqueId,records_type)values(#{uniqueId},#{count})
+	</insert>
+	</mapper>
