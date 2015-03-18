@@ -129,11 +129,11 @@
 		iconCls:'icon-add',
 		handler:function(){
 
-			if($('#transfer').datagrid('getRows').length>0)
-			{
-				$.messager.alert('系统消息','已经有转接号码','info');
-				return;
-			}
+//			if($('#transfer').datagrid('getRows').length>0)
+//			{
+//				$.messager.alert('系统消息','已经有转接号码','info');
+//				return;
+//			}
 			openNewTransfer();
     	
 		}
@@ -211,21 +211,20 @@
 		var endTime = $('#endTimeToAdd').datetimebox('getValue');
 		var status = $('#statusToAdd').combobox('getValue');
 		var account = GetQueryString("account");
-		
+		var areaId = "";
+		var area = "";
 		var d = new Date();
 		var submitTime = d.getFullYear() + "-" +((d.getMonth()+1)<10?"0":"")+(d.getMonth()+1) + "-" + (d.getDate()<10?"0":"")+d.getDate() + " " + (d.getHours()<10?"0":"")+d.getHours() + ":" + (d.getMinutes()<10?"0":"")+d.getMinutes() + ":" + (d.getSeconds()<10?"0":"")+d.getSeconds();
 		
-		var areaId = "0592,";
- 	 	var area = "厦门,";
-// 	 	var items = $('#makeSureItem input');
-// 	 	for(var i=0;i<items.length;i++)
-// 	 	{
-// 	 	 	if(items[i].checked)
-// 	 	 	{
-//	 	 		areaId += items[i].value+',';
-//	 	 		area += items[i].name+',';
-// 	 	 	}
-// 	 	 }
+ 	 	var items = $('#makeSureItem input');
+ 	 	for(var i=0;i<items.length;i++)
+ 	 	{
+ 	 	 	if(items[i].checked)
+ 	 	 	{
+	 	 		areaId += items[i].value+',';
+	 	 		area += items[i].name+',';
+ 	 	 	}
+ 	 	 }
 
 		var varify;//用于查询验证,验证开始时间是否小于结束时间 
 		varify=beginTime>endTime; 
@@ -253,26 +252,26 @@
 				$.messager.alert('系统消息','请选择状态','info');
 				return ;
 				}
-//			if(areaId==''){
-//				$.messager.alert('系统消息','请选择区域','info');
-//				return ;
-//				}
-//			if(area==''){
-//				$.messager.alert('系统消息','请选择区域','info');
-//				return ;
-//				}
-//
-//			//验证所设区域是否已经分配转接人员
-//			$.ajax( {
-//				cache : true,
-//				type : "POST",
-//				url : 'transfer.do?method=isAreaExist&area=' + encodeURIComponent(areaId),
-//				async : false,
-//				dataType : "html",
-//				success : function(data) {
-//			    	
-//					var json = $.parseJSON(data);
-//					if (json.statu == "200") {
+			if(areaId==''){
+				$.messager.alert('系统消息','请选择区域','info');
+				return ;
+				}
+			if(area==''){
+				$.messager.alert('系统消息','请选择区域','info');
+				return ;
+				}
+			
+			//验证所设区域是否已经分配转接人员
+			$.ajax( {
+				cache : true,
+				type : "POST",
+				url : 'transfer.do?method=isAreaExist&area=' + encodeURIComponent(areaId),
+				async : false,
+				dataType : "html",
+				success : function(data) {
+			    	
+					var json = $.parseJSON(data);
+					if (json.statu == "200") {
 						
 						$.ajax( {
 							cache : true,
@@ -298,11 +297,11 @@
 							}
 						});
 						
-//					}else{
-//						$.messager.alert('系统消息',json.statu+"\n\t区域已经设置",'warning');
-//					}
-//				}
-//			});
+					}else{
+						$.messager.alert('系统消息',json.statu+"\n\t区域已经设置",'warning');
+					}
+				}
+			});
 			
 
 		
@@ -317,42 +316,42 @@
 		var account = GetQueryString("account");
 		var submitTime = $('#submitTimeToEdit').val();
 		var batchId = $('#batchIdToEdit').val();
-		var areaId = "0592,";
-//		var newAreaId = "";
- 	 	var area = "厦门,";
-// 	 	var items = $('#currentMakeSureItem input');
-// 	 	var old_items = $('#currentMakeSureItem_old input');
-// 	 	
-// 	 	for(var i=0;i<items.length;i++)
-// 	 	{
-// 	 	 	if(items[i].checked)
-// 	 	 	{
-//	 	 		areaId += items[i].value+',';
-//	 	 		area += items[i].name+',';
-// 	 	 	}
-// 	 	 }
-// 	 	
-// 	 	for(var i=0;i<items.length;i++)
-// 	 	{
-// 	 		var count = 1;
-// 	 		
-// 	 		for(var j=0;j<old_items.length;j++)
-// 	 	 	{
-// 	 	 	 	if(items[i].checked && items[i].value == old_items[j].value)
-// 	 	 	 	{
-// 	 	 	 		break;
-// 	 	 	 	}
-// 	 	 	 	else
-// 	 	 	 	{
-// 	 	 	 		count++;
-// 	 	 	 	}
-// 	 	 	 }
-//
-// 	 		if(items[i].checked && count>old_items.length)
-// 	 		{
-// 	 			newAreaId += items[i].value+',';
-// 	 		}
-// 	 	 }
+		var areaId = "";
+		var area = "";
+		var newAreaId = "";
+ 	 	var items = $('#currentMakeSureItem input');
+ 	 	var old_items = $('#currentMakeSureItem_old input');
+ 	 	
+ 	 	for(var i=0;i<items.length;i++)
+ 	 	{
+ 	 	 	if(items[i].checked)
+ 	 	 	{
+	 	 		areaId += items[i].value+',';
+	 	 		area += items[i].name+',';
+ 	 	 	}
+ 	 	 }
+ 	 	
+ 	 	for(var i=0;i<items.length;i++)
+ 	 	{
+ 	 		var count = 1;
+ 	 		
+ 	 		for(var j=0;j<old_items.length;j++)
+ 	 	 	{
+ 	 	 	 	if(items[i].checked && items[i].value == old_items[j].value)
+ 	 	 	 	{
+ 	 	 	 		break;
+ 	 	 	 	}
+ 	 	 	 	else
+ 	 	 	 	{
+ 	 	 	 		count++;
+ 	 	 	 	}
+ 	 	 	 }
+
+ 	 		if(items[i].checked && count>old_items.length)
+ 	 		{
+ 	 			newAreaId += items[i].value+',';
+ 	 		}
+ 	 	 }
 
 		var varify;//用于查询验证,验证开始时间是否小于结束时间 
 		varify=beginTime>endTime; 
@@ -380,26 +379,26 @@
 				$.messager.alert('系统消息','请选择状态','info');
 				return ;
 				}
-//			if(areaId==''){
-//				$.messager.alert('系统消息','请选择区域','info');
-//				return ;
-//				}
-//			if(area==''){
-//				$.messager.alert('系统消息','请选择区域','info');
-//				return ;
-//				}
-//			
-//			//验证所设区域是否已经分配转接人员
-//			$.ajax( {
-//				cache : true,
-//				type : "POST",
-//				url : 'transfer.do?method=isAreaExist&area=' + encodeURIComponent(newAreaId),
-//				async : false,
-//				dataType : "html",
-//				success : function(data) {
-//			    	
-//					var json = $.parseJSON(data);
-//					if (json.statu == "200") {
+			if(areaId==''){
+				$.messager.alert('系统消息','请选择区域','info');
+				return ;
+				}
+			if(area==''){
+				$.messager.alert('系统消息','请选择区域','info');
+				return ;
+				}
+			
+			//验证所设区域是否已经分配转接人员
+			$.ajax( {
+				cache : true,
+				type : "POST",
+				url : 'transfer.do?method=isAreaExist&area=' + encodeURIComponent(newAreaId),
+				async : false,
+				dataType : "html",
+				success : function(data) {
+			    	
+					var json = $.parseJSON(data);
+					if (json.statu == "200") {
 						
 						$.ajax( {
 							cache : true,
@@ -420,11 +419,11 @@
 							}
 						});
 						
-//					}else{
-//						$.messager.alert('系统消息',json.statu+"\n\t区域已经设置",'warning');
-//					}
-//				}
-//			});
+					}else{
+						$.messager.alert('系统消息',json.statu+"\n\t区域已经设置",'warning');
+					}
+				}
+			});
 
 
 		};

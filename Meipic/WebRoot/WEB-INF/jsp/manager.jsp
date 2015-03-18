@@ -2,8 +2,8 @@
 <%
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
-//String selectArea = (String)request.getAttribute("selectArea");
-//String currentSelectArea = (String)request.getAttribute("currentSelectArea");
+String selectArea = (String)request.getAttribute("selectArea");
+String currentSelectArea = (String)request.getAttribute("currentSelectArea");
 %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
@@ -82,7 +82,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				</tr>
 			</table>
 
-			<%--<table>
+			<table>
 			<tr>
 				<td><a href="javascript:void(0)" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-add'" onclick="$('#select_area_dialog').dialog('open')">选择区域</a></td>
 			</tr>
@@ -91,7 +91,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			</tr>
 			</table>
 			<div id="makeSureItem"></div>
-	--%></div>
+	</div>
 	<%-- 编辑用户的弹出层 --%>
 	<div id="edit_user_dialog" class="easyui-dialog" title="用户信息" data-options="buttons: [{
 					text:'确定',
@@ -133,7 +133,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				</tr>
 			</table>
 
-			<%--<table>
+			<table>
 			<tr>
 				<td><a href="javascript:void(0)" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-add'" 
 				onclick="openCurrentSelectArea()">选择区域</a></td>
@@ -143,8 +143,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			</tr>
 			</table>
 			<div id="currentMakeSureItem"></div>
-	--%></div>
-	<%-- 选择区域的弹出层 
+	</div>
+	<%-- 选择区域的弹出层 --%>
 	<div id="select_area_dialog" class="easyui-dialog" title="选择区域" data-options="buttons: [{
 					text:'确定',
 					iconCls:'icon-ok',
@@ -161,7 +161,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			
 		<%=selectArea %>
 	</div>
-	 当前用户选择区域的弹出层 
+	<%-- 当前用户选择区域的弹出层 --%>
 	<div id="current_select_area_dialog" class="easyui-dialog" title="选择区域" data-options="buttons: [{
 					text:'确定',
 					iconCls:'icon-ok',
@@ -178,7 +178,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			
 		<%=currentSelectArea %>
 	</div>
-	--%><%-- 新建角色的弹出层 --%>
+	<%-- 新建角色的弹出层 --%>
 	<div id="add_role_dialog" class="easyui-dialog" title="新建角色" data-options="buttons: [{
 					text:'确定',
 					iconCls:'icon-ok',
@@ -395,9 +395,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					<td style="width: 180"><input id="user_role_search" style="width: 150px"></input></td>
 					<td width="60px">所属部门：</td>
 					<td style="width: 180"><input id="user_department_search" style="width: 150px"></input></td>
-					<%--<td width="60px">负责区域：</td>
+					<td width="60px">负责区域：</td>
 					<td style="width: 180"><input id="user_area_search" class="easyui-textbox" style="width: 150px"></input></td>
-				--%>
 					<td width="60px">联系电话：<input id="user_area_search" class="easyui-textbox" style="display:none"></input></td>
 					<td style="width: 180"><input id="user_tel_search" class="easyui-textbox" style="width: 150px"></input></td>
 				</tr>
@@ -424,7 +423,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 									  return value.substr(0,value.length-1);
 									}else{
 									 return value;
-									}},hidden:true">负责区域</th>
+									}}">负责区域</th>
 						<th data-options="field:'tel',width:120,align:'right'">联系电话</th>
 						<th data-options="field:'status',width:80,align:'center'">状态</th>
 						<th data-options="field:'xxx',width:180,align:'center',formatter:userOperate">操作</th>

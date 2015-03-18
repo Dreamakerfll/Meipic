@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project-module
   type="WEB"
-  name="Meipic"
+  name="MeituWeb"
   id="myeclipse.1417596300969"
-  context-root="/Meipic"
+  context-root="/MeituWeb"
   j2ee-spec="5.0"
-  archive="Meipic.war">
+  archive="MeituWeb.war">
   <attributes>
     <attribute name="webrootdir" value="/WebRoot" />
   </attributes>

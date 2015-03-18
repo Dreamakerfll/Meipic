@@ -118,14 +118,6 @@ public class Transfer
 	{
 		this.transferAreaId = transferAreaId;
 	}
-	public String getTransferArea()
-	{
-		return transferArea;
-	}
-	public void setTransferArea(String transferArea)
-	{
-		this.transferArea = transferArea;
-	}
 	public String getTransferBatch()
 	{
 		return transferBatch;
@@ -134,5 +126,14 @@ public class Transfer
 	{
 		this.transferBatch = transferBatch;
 	}
+	public String getTransferArea()
+	{
+		return transferArea;
+	}
+	public void setTransferArea(String transferArea)
+	{
+		this.transferArea = transferArea;
+	}
+	
 	
 }

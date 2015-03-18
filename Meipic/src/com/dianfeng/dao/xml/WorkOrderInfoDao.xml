@@ -48,7 +48,7 @@
 	</delete>
 	
 	<select id="getDetailWorkOrder" parameterType="com.dianfeng.entity.WorkOrderDetailInfo" resultMap="workOrderDetailInfoMap">
-		SELECT * FROM (SELECT work_order_id FROM (SELECT work_order_table.work_order_id FROM (SELECT * FROM work_order_info 
+		SELECT * FROM (SELECT work_order_id FROM (SELECT work_order_table.work_order_id FROM (SELECT work_order_id FROM work_order_info 
 		LEFT OUTER JOIN follow_history_info ON work_order_info.work_order_id = follow_history_info.follow_history_work_order_id WHERE 1=1 
 		<if test="assemblyLine !=null and assemblyLine !=''">
 			and work_order_info.work_order_assembly_line like concat(concat('%', #{assemblyLine}),'%')
@@ -162,7 +162,7 @@
 	</select>
 	
 	<select id="getDetailWorkOrderCount" parameterType="com.dianfeng.entity.WorkOrderDetailInfo" resultType="Integer">
-		SELECT count(distinct work_order_table.work_order_id) FROM (SELECT * FROM work_order_info 
+		SELECT count(distinct work_order_table.work_order_id) FROM (SELECT work_order_id FROM work_order_info 
 		LEFT OUTER JOIN follow_history_info ON work_order_info.work_order_id = follow_history_info.follow_history_work_order_id WHERE 1=1 
 		<if test="assemblyLine !=null and assemblyLine !=''">
 			and work_order_info.work_order_assembly_line like concat(concat('%', #{assemblyLine}),'%')
