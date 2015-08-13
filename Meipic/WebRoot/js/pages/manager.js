@@ -483,28 +483,27 @@
     	var user_department = $('#user_department_add').combobox('getValue');
     	var user_role = $('#user_role_add').combobox('getValue');
     	var user_status = $('#user_status_add').combobox('getValue');
-    	
-    	var area = "厦门,";
-	 	var queue = "meitu,";
-//	 	var items = $('#makeSureItem input');
-// 	 	for(var i=0;i<items.length;i++)
-// 	 	{
-// 	 	 	if(items[i].checked)
-// 	 	 	{
-// 	 	 		area += items[i].name+',';
-// 	 	 		queue += items[i].value+',';
-// 	 	 	}
-// 	 	 }
-// 	 	
-// 	 	//检查区域是否有选择
-//		if(area==''){
-//			$.messager.alert('系统消息','请选择区域','info');
-//			return ;
-//			}
-//		if(queue==''){
-//			$.messager.alert('系统消息','请选择区域','info');
-//			return ;
-//			}
+    	var area = "";
+    	var queue = "";
+	 	var items = $('#makeSureItem input');
+ 	 	for(var i=0;i<items.length;i++)
+ 	 	{
+ 	 	 	if(items[i].checked)
+ 	 	 	{
+ 	 	 		area += items[i].name+',';
+ 	 	 		queue += items[i].value+',';
+ 	 	 	}
+ 	 	 }
+ 	 	
+ 	 	//检查区域是否有选择
+		if(area==''){
+			$.messager.alert('系统消息','请选择区域','info');
+			return ;
+			}
+		if(queue==''){
+			$.messager.alert('系统消息','请选择区域','info');
+			return ;
+			}
 		
 		//封装成用户对象
  	 	var user_info = JSON.stringify({
@@ -586,28 +585,27 @@
     	var user_department = $('#user_department_edit').combobox('getValue');
     	var user_role = $('#user_role_edit').combobox('getValue');
     	var user_status = $('#user_status_edit').combobox('getValue');
-    	
-    	var area = "厦门,";
-	 	var queue = "meitu,";
-//	 	var items = $('#currentMakeSureItem input');
-// 	 	for(var i=0;i<items.length;i++)
-// 	 	{
-// 	 	 	if(items[i].checked)
-// 	 	 	{
-// 	 	 		area += items[i].name+',';
-// 	 	 		queue += items[i].value+',';
-// 	 	 	}
-// 	 	 }
-// 	 	
-// 	 	//检查区域是否有选择
-//		if(area==''){
-//			$.messager.alert('系统消息','请选择区域','info');
-//			return ;
-//			}
-//		if(queue==''){
-//			$.messager.alert('系统消息','请选择区域','info');
-//			return ;
-//			}
+    	var area = "";
+    	var queue = "";
+	 	var items = $('#currentMakeSureItem input');
+ 	 	for(var i=0;i<items.length;i++)
+ 	 	{
+ 	 	 	if(items[i].checked)
+ 	 	 	{
+ 	 	 		area += items[i].name+',';
+ 	 	 		queue += items[i].value+',';
+ 	 	 	}
+ 	 	 }
+ 	 	
+ 	 	//检查区域是否有选择
+		if(area==''){
+			$.messager.alert('系统消息','请选择区域','info');
+			return ;
+			}
+		if(queue==''){
+			$.messager.alert('系统消息','请选择区域','info');
+			return ;
+			}
 		
 		//封装成用户对象
  	 	var user_info = JSON.stringify({

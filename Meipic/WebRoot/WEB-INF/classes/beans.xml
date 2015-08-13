@@ -18,9 +18,10 @@
 	<!-- 1.数据源：DriverManagerDateSource -->
 		<bean id="ds1" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-		<property name="url" value="jdbc:mysql://192.168.0.133:3306/cmcallcenter_db?allowMultiQueries=true"/>
+		<property name="url" value="jdbc:mysql://localhost:3306/cmcallcenter_db?allowMultiQueries=true"/>
+
 		<property name="username" value="root"/>
-		<property name="password" value="techsum"/>		
+		<property name="password" value="root"/>
 		</bean>
 		<bean id="ds2" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName" value="com.mysql.jdbc.Driver"/>
@@ -94,16 +95,4 @@
        <aop:config proxy-target-class="true">
              <aop:advisor pointcut="execution(* com.dianfeng..*service.*(..))" advice-ref="txAdvice" />
        </aop:config>
-       
-        <bean id="ManagerService" class="com.dianfeng.service.impl.ManagerServiceImpl"
-			autowire="byType" />
-		<bean id="GeneralFactory" class="com.dianfeng.socket.GeneralFactory" autowire="byType"></bean>
-	
-       <!--  
-       <bean id="ManagerService" class="com.dianfeng.service.impl.ManagerServiceImpl"
-			autowire="byType" />
-	   <bean id="AngentJobService" class="com.dianfeng.service.impl.AgentJobServiceImpl"
-			autowire="byType" />
-	  <bean id="GeneralFactory" class="com.dianfeng.socket.GeneralFactory" autowire="byType"></bean>
-	  -->
 	</beans>

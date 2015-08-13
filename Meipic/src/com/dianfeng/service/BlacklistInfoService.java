@@ -2,8 +2,6 @@ package com.dianfeng.service;
 
 import java.util.List;
 
-import org.apache.ibatis.annotations.Param;
-
 import com.dianfeng.entity.BlacklistInfo;
 
 public interface BlacklistInfoService

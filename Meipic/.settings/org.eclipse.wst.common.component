@@ -3,7 +3,7 @@
     <wb-module deploy-name="Meitu">
         <wb-resource deploy-path="/" source-path="/WebRoot"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
-        <property name="context-root" value="/Meitu"/>
         <property name="java-output-path" value="/Meitu/WebRoot/WEB-INF/classes"/>
+        <property name="context-root" value="/MeituWeb"/>
     </wb-module>
 </project-modules>

@@ -4,8 +4,8 @@ String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
 String isMonitor = request.getParameter("isMonitor");
 String account = request.getParameter("account");
-//String selectArea = (String)request.getAttribute("selectArea");
-//String currentSelectArea = (String)request.getAttribute("currentSelectArea");
+String selectArea = (String)request.getAttribute("selectArea");
+String currentSelectArea = (String)request.getAttribute("currentSelectArea");
 %>
 
 <!DOCTYPE HTML>
@@ -60,9 +60,7 @@ String account = request.getParameter("account");
 			</tr>
 		</table>
 	</div>
-	<%--
-	
-	 选择区域的弹出层 
+	<%-- 选择区域的弹出层 --%>
 	<div id="selectArea" class="easyui-dialog" title="选择区域" data-options="buttons: [{
 					text:'确定',
 					iconCls:'icon-ok',
@@ -80,7 +78,7 @@ String account = request.getParameter("account");
 		<%=selectArea %>
 	</div>
 	
-	 当前用户选择区域的弹出层 
+	<%-- 当前用户选择区域的弹出层 --%>
 	<div id="currentSelectArea" class="easyui-dialog" title="选择区域" data-options="buttons: [{
 					text:'确定',
 					iconCls:'icon-ok',
@@ -98,8 +96,7 @@ String account = request.getParameter("account");
 		
 	</div>
   
-  --%>
-  <%-- 添加转接的弹出层 --%>
+	<%-- 添加转接的弹出层 --%>
  	 <div id="addTransfer" class="easyui-dialog" title="添加转接" data-options="buttons: [{
 					text:'确定',
 					iconCls:'icon-ok',
@@ -129,7 +126,7 @@ String account = request.getParameter("account");
 				<td>状态：</td>
 				<td><input id="statusToAdd" style="width:150px"></input></td>
 			</tr>
-			</table><%--
+			</table>
 			<table>
 			<tr>
 				<td><a href="javascript:void(0)" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-add'" onclick="$('#selectArea').dialog('open')">选择区域</a></td>
@@ -139,7 +136,7 @@ String account = request.getParameter("account");
 			</tr>
 			</table>
 			<div id="makeSureItem"></div>
-	--%></div>
+	</div>
 	
 	<%-- 编辑转接的弹出层 --%>
  	 <div id="editTransfer" class="easyui-dialog" title="编辑转接" data-options="buttons: [{
@@ -172,7 +169,7 @@ String account = request.getParameter("account");
 				<td><input id="statusToEdit" style="width:150px"></input><input id="submitTimeToEdit" class="easyui-textbox" style="display:none"></input><input id="batchIdToEdit" class="easyui-textbox" style="display:none"></input></td>
 			</tr>
 			</table>
-			<%--<table>
+			<table>
 			<tr>
 				<td><a href="javascript:void(0)" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-add'" onclick="openCurrentSelectArea()">选择区域</a></td>
 			</tr>
@@ -182,7 +179,7 @@ String account = request.getParameter("account");
 			</table>
 			<div id="currentMakeSureItem"></div>
 			<div id="currentMakeSureItem_old" style="display:none"></div>
-	--%></div>
+	</div>
 	
 	<script type="text/javascript">
 		$('.loading').animate({'width':'55%'},50);  //第二个节点
@@ -213,7 +210,7 @@ String account = request.getParameter("account");
 				<th data-options="field:'transferNumber',width:80,align:'right'">转接号码</th>
 				<th data-options="field:'beginTime',width:90,align:'center'">开始时间</th>
 				<th data-options="field:'endTime',width:90,align:'center'">结束时间</th>
-				<th data-options="field:'transferArea',width:140,align:'left',hidden:true">区域</th>
+				<th data-options="field:'transferArea',width:140,align:'left'">区域</th>
 				<th data-options="field:'transferAreaId',width:80,hidden:true">区域ID</th>
 				<th data-options="field:'status',width:40,align:'center',formatter:function(value,row)
 									{if(value=='1'){

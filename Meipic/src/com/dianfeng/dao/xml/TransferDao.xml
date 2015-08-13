@@ -9,10 +9,10 @@
 		,info_transfer_transfernum
 		,info_transfer_account
 		,info_transfer_status
-		,GROUP_CONCAT(info_transfer_area ORDER BY info_transfer_area SEPARATOR ",") AS info_transfer_area 
-		,GROUP_CONCAT(info_transfer_area_content ORDER BY info_transfer_area_content SEPARATOR ",") AS info_transfer_area_content
+		,GROUP_CONCAT(info_transfer_area ORDER BY info_transfer_area SEPARATOR ',') AS info_transfer_area 
+		,GROUP_CONCAT(CAST(info_transfer_area_name AS CHAR) SEPARATOR ',') AS info_transfer_area_name
 		,info_transfer_batch
-		FROM info_transfer GROUP BY info_transfer_batch order by info_transfer_submitTime desc
+		FROM info_transfer GROUP BY info_transfer_batch ORDER BY info_transfer_submitTime desc
 	</select>
 	
 	<select id="getTransferByAccount" parameterType="String" resultMap="transferMap">
@@ -23,7 +23,7 @@
 		,info_transfer_account
 		,info_transfer_status
 		,GROUP_CONCAT(info_transfer_area ORDER BY info_transfer_area SEPARATOR ",") AS info_transfer_area 
-		,GROUP_CONCAT(info_transfer_area_content ORDER BY info_transfer_area_content SEPARATOR ",") AS info_transfer_area_content
+		,GROUP_CONCAT(info_transfer_area_name ORDER BY info_transfer_area_name SEPARATOR ",") AS info_transfer_area_name
 		,info_transfer_batch
 		FROM info_transfer
 		where info_transfer_account=#{account} GROUP BY info_transfer_batch order by info_transfer_submitTime desc
@@ -37,12 +37,12 @@
 		,info_transfer_account
 		,info_transfer_status
 		,GROUP_CONCAT(info_transfer_area ORDER BY info_transfer_area SEPARATOR ",") AS info_transfer_area 
-		,GROUP_CONCAT(info_transfer_area_content ORDER BY info_transfer_area_content SEPARATOR ",") AS info_transfer_area_content
+		,GROUP_CONCAT(info_transfer_area_name ORDER BY info_transfer_area_name SEPARATOR ",") AS info_transfer_area_name
 		,info_transfer_batch
 		FROM info_transfer
 		WHERE info_transfer_batch IN (SELECT info_transfer_batch FROM info_transfer WHERE 1=1
 		<if test="area !=null and area !=''">
-		AND info_transfer_area_content LIKE concat(concat('%', #{area}),'%') 
+		AND info_transfer_area_name LIKE concat(concat('%', #{area}),'%') 
 		</if>
 		<if test="beginTime !=null and beginTime !=''">
 		AND info_transfer_starttime &gt;=#{beginTime} 
@@ -62,7 +62,7 @@
 	</select>
 	
 	<select id="isAreaExist" resultType="String">
-		SELECT GROUP_CONCAT(info_transfer_area_content ORDER BY info_transfer_area_content SEPARATOR ",") AS info_transfer_area_content 
+		SELECT GROUP_CONCAT(info_transfer_area_name ORDER BY info_transfer_area_name SEPARATOR ",") AS info_transfer_area_name 
 		FROM info_transfer 
 		WHERE info_transfer_area IN
 				<foreach item="areaList" index="index" collection="areaList"   
@@ -80,7 +80,7 @@
 		info_transfer_account,
 		info_transfer_status,
 		info_transfer_area,
-		info_transfer_area_content,
+		info_transfer_area_name,
 		info_transfer_batch) values
 		<foreach collection="transferList" item="item" index="index" separator=",">
 		(#{item.beginTime},
@@ -114,9 +114,8 @@
 	<result column="info_transfer_account" property="account"/>
 	<result column="info_transfer_status" property="status"/>
 	<result column="info_transfer_area" property="transferAreaId"/>
-	<result column="info_transfer_area_content" property="transferArea"/>
+	<result column="info_transfer_area_name" property="transferArea"/>
 	<result column="info_transfer_batch" property="transferBatch"/>
-	<result column="inter_account" property="account"/>
 	</resultMap>
 	
 	</mapper>
